@@ -26,7 +26,7 @@ import java.sql.DriverManager;
 
 import javax.sql.DataSource;
 
-import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
 import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
@@ -66,7 +66,7 @@ class DevContainerConfiguration {
 
 			@Override
 			public String getJdbcUrl() {
-				return "jdbc:mysql://127.0.0.1:3306/library_service_test";
+				return "jdbc:postgres://127.0.0.1:5432/library_service_test";
 			}
 		};
 	}
@@ -75,8 +75,12 @@ class DevContainerConfiguration {
 	@ConditionalOnMissingLocalDatabase
 	@ServiceConnection
 	@SuppressWarnings("resource")
-	MySQLContainer<?> mysqlContainer() {
-		return new MySQLContainer<>("mysql:8").withReuse(true);
+	PostgreSQLContainer<?> postgreSQLContainer() {
+		// Due to the test-context cache, tests keeps connections.
+		// Need to increase the max connections for test.
+		return new PostgreSQLContainer<>("postgres:16").withReuse(true).withCommand("postgres -c max_connections=100")
+				.withCreateContainerCmdModifier((cmd) -> cmd.withName("library-service-testcontainer"));
+
 	}
 
 	// TODO: think about initialization
@@ -112,7 +116,7 @@ class DevContainerConfiguration {
 	static class OnLocalDatabaseCondition extends SpringBootCondition implements ConfigurationCondition {
 
 		// TODO: use parameters instead of the hardcoded value
-		static final String localJdbcUrl = "jdbc:mysql://127.0.0.1:3306/library_service_test?user=root&password=password";
+		static final String localJdbcUrl = "jdbc:postgres://127.0.0.1:5432/library_service_test?user=root&password=password";
 
 		@Override
 		public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
@@ -129,7 +133,7 @@ class DevContainerConfiguration {
 		}
 
 		private boolean isLocalDatabaseAvailable() {
-			// check local mysql is running or not
+			// check local db is running or not
 			try (Connection connection = DriverManager.getConnection(localJdbcUrl)) {
 				return true;
 			}

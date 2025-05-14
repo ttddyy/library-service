@@ -23,6 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -31,6 +32,9 @@ import org.springframework.context.annotation.Import;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Import(DevContainerConfiguration.class)
+// To avoid exceeding the max connection due to test-context caching, minimize the
+// num of pool size for each test.
+@TestPropertySource(properties = { "spring.datasource.hikari.maximum-pool-size=2" })
 public @interface DbTest {
 
 }

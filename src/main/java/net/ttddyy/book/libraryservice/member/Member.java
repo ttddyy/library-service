@@ -32,7 +32,7 @@ public class Member {
 
 	// This entity is populated by batch job in DB directly.
 	@Id
-	@Column(name = "member_id")
+	@Column(name = "id")
 	private Long id;
 
 	@Column(name = "date_added", insertable = false, updatable = false)

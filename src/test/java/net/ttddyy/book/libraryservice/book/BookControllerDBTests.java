@@ -196,7 +196,7 @@ class BookControllerDBTests {
 
 	private void createTestData() {
 		String sql = """
-					INSERT INTO books (book_id, school_id, title, author, isbn, publisher, book_category_id, is_missing, date_lost)
+					INSERT INTO books (id, school_id, title, author, isbn, publisher, book_category_id, is_missing, date_lost)
 					VALUES  (1200000, 'river', 'foo', 'foo', 'foo', 'foo', 3, false, null);
 				""";
 		this.jdbcTemplate.update(sql);
@@ -205,7 +205,7 @@ class BookControllerDBTests {
 	@Test
 	void list() {
 		String sql = """
-					INSERT INTO books (book_id, school_id, title, author, isbn, publisher, book_category_id, is_missing, date_lost, num_checkouts)
+					INSERT INTO books (id, school_id, title, author, isbn, publisher, book_category_id, is_missing, date_lost, num_checkouts)
 					VALUES  (1, 'sky', 'foo', 'foo', 'foo', 'foo', 3, false, null, 10),
 							(2, 'sky', 'bar', 'bar', 'bar', 'bar', 3, true,'2020-02-22', 20),
 							(3, 'ocean', 'baz', 'baz', 'baz', 'baz', 10, true,'2020-02-22', 30)
@@ -229,7 +229,7 @@ class BookControllerDBTests {
 	@Test
 	void get() {
 		String sql = """
-					INSERT INTO books (book_id, school_id, title, author, isbn, publisher, book_category_id, is_missing, date_lost)
+					INSERT INTO books (id, school_id, title, author, isbn, publisher, book_category_id, is_missing, date_lost)
 					VALUES  (1, 'sky', 'foo', 'foo', 'foo', 'foo', 3, false,null),
 							(2, 'sky', 'bar', 'bar', 'bar', 'bar', 3, true,'2020-02-22')
 					;

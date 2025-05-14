@@ -64,7 +64,7 @@ class CheckoutRepositoryTests {
 		String sql;
 		// members
 		sql = """
-					INSERT INTO members (member_id, firstname_en, lastname_en, school, grade)
+					INSERT INTO members (id, firstname_en, lastname_en, school, grade)
 					VALUES	(10, 'foo', 'foo', 'sky', 7),
 							(20, 'bar', 'bar', 'ocean', 2);
 				""";
@@ -72,7 +72,7 @@ class CheckoutRepositoryTests {
 
 		// books
 		sql = """
-					INSERT INTO books (book_id, school_id, title, author, isbn, publisher, book_category_id, is_missing, date_lost, num_checkouts)
+					INSERT INTO books (id, school_id, title, author, isbn, publisher, book_category_id, is_missing, date_lost, num_checkouts)
 					VALUES  (1, 'sky', 'foo', 'foo', 'foo', 'foo', 3, false, null, 10),
 							(2, 'sky', 'bar', 'bar', 'bar', 'bar', 3, true,'2020-02-22', 20),
 							(3, 'ocean', 'baz', 'baz', 'baz', 'baz', 10, true,'2020-02-22', 30),
@@ -104,7 +104,7 @@ class CheckoutRepositoryTests {
 		String sql;
 		// members
 		sql = """
-					INSERT INTO members (member_id, firstname_en, lastname_en, school, grade)
+					INSERT INTO members (id, firstname_en, lastname_en, school, grade)
 					VALUES	(10, 'foo', 'foo', 'sky', 7),
 							(20, 'bar', 'bar', 'ocean', 2);
 				""";
@@ -112,7 +112,7 @@ class CheckoutRepositoryTests {
 
 		// books
 		sql = """
-					INSERT INTO books (book_id, school_id, title, author, isbn, publisher, book_category_id, is_missing, date_lost, num_checkouts)
+					INSERT INTO books (id, school_id, title, author, isbn, publisher, book_category_id, is_missing, date_lost, num_checkouts)
 					VALUES  (1, 'sky', 'foo', 'foo', 'foo', 'foo', 3, false, null, 10),
 							(2, 'sky', 'bar', 'bar', 'bar', 'bar', 3, true,'2020-02-22', 20),
 							(3, 'ocean', 'baz', 'baz', 'baz', 'baz', 10, true,'2020-02-22', 30),
@@ -140,7 +140,7 @@ class CheckoutRepositoryTests {
 		String sql;
 		// members
 		sql = """
-					INSERT INTO members (member_id, firstname_en, lastname_en, school, grade)
+					INSERT INTO members (id, firstname_en, lastname_en, school, grade)
 					VALUES	(10, 'foo', 'foo', 'sky', 7),
 							(20, 'bar', 'bar', 'ocean', 2);
 				""";
@@ -148,7 +148,7 @@ class CheckoutRepositoryTests {
 
 		// books
 		sql = """
-					INSERT INTO books (book_id, school_id, title, author, isbn, publisher, book_category_id, is_missing, date_lost, num_checkouts)
+					INSERT INTO books (id, school_id, title, author, isbn, publisher, book_category_id, is_missing, date_lost, num_checkouts)
 					VALUES  (1, 'sky', 'foo', 'foo', 'foo', 'foo', 3, false, null, 10),
 							(2, 'sky', 'bar', 'bar', 'bar', 'bar', 3, true,'2020-02-22', 20),
 							(3, 'ocean', 'baz', 'baz', 'baz', 'baz', 10, true,'2020-02-22', 30),

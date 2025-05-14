@@ -31,7 +31,7 @@ CREATE TABLE book_categories
 
 CREATE TABLE books
 (
-    book_id         INT          NOT NULL PRIMARY KEY,
+    id              INT          NOT NULL PRIMARY KEY,
     title           VARCHAR(256) NOT NULL,
     title_kana      VARCHAR(256),
     author          VARCHAR(256) NOT NULL,
@@ -56,7 +56,7 @@ CREATE TABLE books
 
 CREATE TABLE members
 (
-     member_id    INT         NOT NULL PRIMARY KEY,
+     id           INT         NOT NULL PRIMARY KEY,
      date_added   TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
      active       BOOLEAN     NOT NULL DEFAULT TRUE,
      class_number INT,
@@ -80,8 +80,8 @@ CREATE TABLE checkouts
     updated_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (member_id, book_id),
     UNIQUE (book_id),
-    FOREIGN KEY (member_id) REFERENCES members (member_id),
-    FOREIGN KEY (book_id) REFERENCES books (book_id)
+    FOREIGN KEY (member_id) REFERENCES members (id),
+    FOREIGN KEY (book_id) REFERENCES books (id)
 );
 
 
@@ -92,8 +92,8 @@ CREATE TABLE checkouts
 --     member_id     INT  NOT NULL,
 --     checkin_date  DATE NOT NULL,
 --     checkout_date DATE NOT NULL,
---     FOREIGN KEY (member_id) REFERENCES members (member_id),
---     FOREIGN KEY (book_id) REFERENCES books (book_id)
+--     FOREIGN KEY (member_id) REFERENCES members (id),
+--     FOREIGN KEY (book_id) REFERENCES books (id)
 -- );
 
 CREATE TABLE limits
@@ -104,7 +104,7 @@ CREATE TABLE limits
     PRIMARY KEY (role, property)
 );
 
-CREATE TABLE schedule
+CREATE TABLE schedules
 (
     date                 VARCHAR(16) NOT NULL,
     school               VARCHAR(8)  NOT NULL,
@@ -198,7 +198,7 @@ CREATE TRIGGER update_limits_updated_at
 EXECUTE FUNCTION moddatetime(updated_at);
 
 CREATE TRIGGER update_schedule_updated_at
-    BEFORE UPDATE ON schedule
+    BEFORE UPDATE ON schedules
     FOR EACH ROW
 EXECUTE FUNCTION moddatetime(updated_at);
 
@@ -216,5 +216,3 @@ CREATE TRIGGER update_checkout_limit_schedules_updated_at
     BEFORE UPDATE ON checkout_limit_schedules
     FOR EACH ROW
 EXECUTE FUNCTION moddatetime(updated_at);
-
--- TODO: schedule => schedules

@@ -48,7 +48,7 @@ class MemberServiceDBTests {
 	@Test
 	void list() {
 		String sql = """
-					INSERT INTO members (member_id, firstname_en, lastname_en, school, grade)
+					INSERT INTO members (id, firstname_en, lastname_en, school, grade)
 					VALUES	(10, 'foo', 'foo', 'sky', 7),
 							(20, 'bar', 'bar', 'ocean', 2);
 				""";

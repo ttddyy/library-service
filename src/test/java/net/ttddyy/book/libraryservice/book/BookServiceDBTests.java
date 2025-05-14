@@ -50,7 +50,7 @@ class BookServiceDBTests {
 	@Test
 	void search() {
 		String sql = """
-					INSERT INTO books (book_id, school_id, title, title_kana, author, author_kana, isbn, book_category_id, publisher)
+					INSERT INTO books (id, school_id, title, title_kana, author, author_kana, isbn, book_category_id, publisher)
 					VALUES  (10, 'ocean', 'title foo', 'タイトル フー', 'author foo', '著者 フー', 'isbn-123', 2, 'パブリッシャー'),
 							(20, 'ocean', 'title bar', 'タイトル バー', 'author bar', '著者 バー', 'isbn-456', 2, 'パブリッシャー');
 				""";

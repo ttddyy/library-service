@@ -39,7 +39,7 @@ import org.springframework.lang.Nullable;
 public class Book {
 
 	@Id
-	@Column(name = "book_id")
+	@Column(name = "id")
 	private Long id;
 
 	@Version

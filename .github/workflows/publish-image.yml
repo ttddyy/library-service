@@ -41,4 +41,4 @@ jobs:
           # configured to reference them in pom.xml
           DOCKER_REGISTRY_USER: ${{ github.actor }}
           DOCKER_REGISTRY_PASS: ${{ secrets.GITHUB_TOKEN }}
-#          CONTAINER_IMAGE_TAGS: "${{ env.DOCKER_IMAGE_NAME }}:latest,${{ env.DOCKER_IMAGE_NAME }}:${{ env.PROJECT_VERSION }}${{ contains(env.PROJECT_VERSION, 'snapshot') && format(',{0}:snapshot', env.DOCKER_IMAGE_NAME) || ''}}"
+          CONTAINER_IMAGE_TAGS: "${{ env.DOCKER_IMAGE_NAME }}:latest,${{ env.DOCKER_IMAGE_NAME }}:${{ env.PROJECT_VERSION }}${{ contains(env.PROJECT_VERSION, 'snapshot') && format(',{0}:snapshot', env.DOCKER_IMAGE_NAME) || ''}}"

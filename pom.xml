@@ -142,10 +142,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <!--
-                  Configure to pass user/pass from command line. ex: -Ddocker.publishRegistry.username=
-                  see https://docs.spring.io/spring-boot/docs/current/maven-plugin/reference/htmlsingle/#build-image.examples.publish
-                -->
                 <configuration>
                     <image>
                         <tags>${env.CONTAINER_IMAGE_TAGS}</tags>

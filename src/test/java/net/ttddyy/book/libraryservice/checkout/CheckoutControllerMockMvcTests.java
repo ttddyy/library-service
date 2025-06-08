@@ -19,7 +19,6 @@ package net.ttddyy.book.libraryservice.checkout;
 import java.time.LocalDate;
 import java.util.List;
 
-import net.ttddyy.book.libraryservice.PageDeserializeConfiguration;
 import net.ttddyy.book.libraryservice.book.Book;
 import net.ttddyy.book.libraryservice.member.Member;
 import net.ttddyy.book.libraryservice.school.SchoolController;
@@ -28,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -46,7 +44,6 @@ import static org.mockito.BDDMockito.given;
  * @author Tadaya Tsuyukubo
  */
 @WebMvcTest(CheckoutController.class)
-@Import(PageDeserializeConfiguration.class)
 class CheckoutControllerMockMvcTests {
 
 	@Autowired

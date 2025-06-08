@@ -21,6 +21,8 @@ import java.io.IOException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.LazyInitializationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -33,8 +35,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 class ApplicationControllerAdvice {
 
+	private static final Logger logger = LoggerFactory.getLogger(ApplicationControllerAdvice.class);
+
 	@ExceptionHandler({ LazyInitializationException.class, EntityNotFoundException.class })
-	void handleException(HttpServletResponse response) throws IOException {
+	void handleException(Exception ex, HttpServletResponse response) throws IOException {
+		logger.error("Error occurred while processing request", ex);
 		response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 	}
 

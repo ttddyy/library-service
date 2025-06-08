@@ -22,6 +22,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
+import org.springframework.data.domain.Page;
+
 /**
  * @author Tadaya Tsuyukubo
  */
@@ -37,5 +39,9 @@ public interface CheckoutLimitScheduleMapper {
 	List<CheckoutLimitSchedule> toEntityList(List<CheckoutLimitScheduleDtoCreate> dtoList);
 
 	void updateEntityFromDto(@MappingTarget CheckoutLimitSchedule entity, CheckoutLimitScheduleDtoUpdate dto);
+
+	default Page<CheckoutLimitScheduleDto> toDtoPage(Page<CheckoutLimitSchedule> page) {
+		return page.map(this::toDto);
+	}
 
 }

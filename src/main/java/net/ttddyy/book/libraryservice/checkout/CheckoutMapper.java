@@ -22,6 +22,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+import org.springframework.data.domain.Page;
+
 /**
  * @author Tadaya Tsuyukubo
  */
@@ -36,5 +38,9 @@ public interface CheckoutMapper {
 	CheckoutDto toDto(Checkout checkout);
 
 	List<CheckoutDto> toDtoList(List<Checkout> entities);
+
+	default Page<CheckoutDto> toDtoPage(Page<Checkout> page) {
+		return page.map(this::toDto);
+	}
 
 }

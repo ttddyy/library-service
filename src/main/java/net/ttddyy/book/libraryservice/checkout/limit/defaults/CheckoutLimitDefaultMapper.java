@@ -22,6 +22,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
+import org.springframework.data.domain.Page;
+
 /**
  * @author Tadaya Tsuyukubo
  */
@@ -33,6 +35,10 @@ public interface CheckoutLimitDefaultMapper {
 	CheckoutLimitDefaultDto toDto(CheckoutLimitDefault entity);
 
 	List<CheckoutLimitDefaultDto> toDtoList(List<CheckoutLimitDefault> entities);
+
+	default Page<CheckoutLimitDefaultDto> toDtoPage(Page<CheckoutLimitDefault> page) {
+		return page.map(this::toDto);
+	}
 
 	void updateEntityFromDto(@MappingTarget CheckoutLimitDefault entity, CheckoutLimitDefaultDtoUpdateBulk dto);
 

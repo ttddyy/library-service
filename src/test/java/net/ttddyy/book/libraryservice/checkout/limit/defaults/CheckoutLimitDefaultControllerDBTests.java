@@ -30,10 +30,10 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PagedModel;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
@@ -136,34 +136,43 @@ class CheckoutLimitDefaultControllerDBTests {
 		this.entityManager.flush();
 
 		Pageable pageable;
-		Page<CheckoutLimitDefaultDto> result;
+		PagedModel<CheckoutLimitDefaultDto> result;
 
 		// get all in one request
 		pageable = PageRequest.of(0, 10, Sort.by("grade"));
 		result = this.controller.list(pageable);
 		assertThat(result).isNotNull();
-		assertThat(result.getTotalPages()).isEqualTo(1);
+		assertThat(result.getMetadata()).isNotNull().satisfies((metadata) -> {
+			assertThat(metadata.size()).isEqualTo(10);
+			assertThat(metadata.number()).isEqualTo(0);
+			assertThat(metadata.totalPages()).isEqualTo(1);
+			assertThat(metadata.totalElements()).isEqualTo(3);
+		});
 		assertThat(result.getContent()).hasSize(3).extracting(CheckoutLimitDefaultDto::grade).containsExactly(1, 2, 3);
-		assertThat(result.isFirst()).isTrue();
-		assertThat(result.isLast()).isTrue();
 
 		// one entry per page
 		pageable = PageRequest.of(1, 1, Sort.by("grade"));
 		result = this.controller.list(pageable);
 		assertThat(result).isNotNull();
-		assertThat(result.getTotalPages()).isEqualTo(3);
+		assertThat(result.getMetadata()).isNotNull().satisfies((metadata) -> {
+			assertThat(metadata.size()).isEqualTo(1);
+			assertThat(metadata.number()).isEqualTo(1);
+			assertThat(metadata.totalPages()).isEqualTo(3);
+			assertThat(metadata.totalElements()).isEqualTo(3);
+		});
 		assertThat(result.getContent()).hasSize(1).first().extracting(CheckoutLimitDefaultDto::grade).isEqualTo(2);
-		assertThat(result.isFirst()).isFalse();
-		assertThat(result.isLast()).isFalse();
 
 		// two entries per page
 		pageable = PageRequest.of(1, 2, Sort.by("grade"));
 		result = this.controller.list(pageable);
 		assertThat(result).isNotNull();
-		assertThat(result.getTotalPages()).isEqualTo(2);
+		assertThat(result.getMetadata()).isNotNull().satisfies((metadata) -> {
+			assertThat(metadata.size()).isEqualTo(2);
+			assertThat(metadata.number()).isEqualTo(1);
+			assertThat(metadata.totalPages()).isEqualTo(2);
+			assertThat(metadata.totalElements()).isEqualTo(3);
+		});
 		assertThat(result.getContent()).hasSize(1).first().extracting(CheckoutLimitDefaultDto::grade).isEqualTo(3);
-		assertThat(result.isFirst()).isFalse();
-		assertThat(result.isLast()).isTrue();
 	}
 
 }

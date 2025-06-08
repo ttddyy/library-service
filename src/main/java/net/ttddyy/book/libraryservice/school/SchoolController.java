@@ -34,7 +34,7 @@ public class SchoolController {
 	}
 
 	@GetMapping("/api/schools")
-	public List<SchoolDto> list() {
+	List<SchoolDto> list() {
 		List<School> entities = this.schoolService.list();
 		List<SchoolDto> schools = SchoolMapper.INSTANCE.entitiesToDtoList(entities);
 		return schools;

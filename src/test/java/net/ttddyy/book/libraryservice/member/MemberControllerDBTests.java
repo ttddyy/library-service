@@ -25,9 +25,9 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PagedModel;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -77,33 +77,39 @@ class MemberControllerDBTests {
 		this.entityManager.flush();
 
 		PageRequest pageable;
-		Page<MemberDto> result;
+		PagedModel<MemberDto> result;
 
 		// get all
 		pageable = PageRequest.of(0, 10, Sort.by("id"));
 		result = this.controller.list(null, pageable);
-		assertThat(result).isNotNull().extracting(MemberDto::id).containsExactly(10L, 20L, 30L);
+		assertThat(result.getContent()).isNotNull().extracting(MemberDto::id).containsExactly(10L, 20L, 30L);
 
 		// with schoolId filter
 		pageable = PageRequest.of(0, 10, Sort.by("id"));
 		result = this.controller.list("school-B", pageable);
-		assertThat(result).isNotNull().extracting(MemberDto::id).containsExactly(20L, 30L);
+		assertThat(result.getContent()).isNotNull().extracting(MemberDto::id).containsExactly(20L, 30L);
 
 		// with pagination
 		pageable = PageRequest.of(1, 1, Sort.by("id"));
 		result = this.controller.list(null, pageable);
-		assertThat(result).isNotNull().extracting(MemberDto::id).containsExactly(20L);
-		assertThat(result.isFirst()).isFalse();
-		assertThat(result.isLast()).isFalse();
-		assertThat(result.getTotalElements()).isEqualTo(3);
+		assertThat(result.getContent()).isNotNull().extracting(MemberDto::id).containsExactly(20L);
+		assertThat(result.getMetadata()).isNotNull().satisfies((metadata) -> {
+			assertThat(metadata.size()).isEqualTo(1);
+			assertThat(metadata.number()).isEqualTo(1);
+			assertThat(metadata.totalPages()).isEqualTo(3);
+			assertThat(metadata.totalElements()).isEqualTo(3);
+		});
 
 		// with filter and pagination
 		pageable = PageRequest.of(1, 1, Sort.by("id"));
 		result = this.controller.list("school-B", pageable);
-		assertThat(result).isNotNull().extracting(MemberDto::id).containsExactly(30L);
-		assertThat(result.isFirst()).isFalse();
-		assertThat(result.isLast()).isTrue();
-		assertThat(result.getTotalElements()).isEqualTo(2);
+		assertThat(result.getContent()).isNotNull().extracting(MemberDto::id).containsExactly(30L);
+		assertThat(result.getMetadata()).isNotNull().satisfies((metadata) -> {
+			assertThat(metadata.size()).isEqualTo(1);
+			assertThat(metadata.number()).isEqualTo(1);
+			assertThat(metadata.totalPages()).isEqualTo(2);
+			assertThat(metadata.totalElements()).isEqualTo(2);
+		});
 	}
 
 }

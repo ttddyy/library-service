@@ -16,15 +16,14 @@
 
 package net.ttddyy.book.libraryservice.checkout;
 
-import java.util.List;
 import java.util.Set;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.springdoc.core.annotations.ParameterObject;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -62,19 +61,17 @@ public class CheckoutController {
 
 	// TODO: memberId has higher priority than schoolId
 	@GetMapping({ "/api/checkouts" })
-	Page<CheckoutDto> list(@RequestParam(required = false) @Nullable Long memberId,
+	PagedModel<CheckoutDto> list(@RequestParam(required = false) @Nullable Long memberId,
 			@RequestParam(required = false) @Nullable String schoolId, @ParameterObject Pageable pageable) {
 		Page<Checkout> page = this.checkoutService.list(memberId, schoolId, pageable);
-		List<CheckoutDto> checkouts = CheckoutMapper.INSTANCE.toDtoList(page.getContent());
-		return new PageImpl<>(checkouts, page.getPageable(), page.getTotalElements());
+		return new PagedModel<>(CheckoutMapper.INSTANCE.toDtoPage(page));
 	}
 
 	@GetMapping({ "/api/checkouts/overdue" })
-	Page<CheckoutDto> overdue(@ParameterObject Pageable pageable) {
+	PagedModel<CheckoutDto> overdue(@ParameterObject Pageable pageable) {
 		// If response json requires more info, create a new dedicated dto class
 		Page<Checkout> page = this.checkoutService.overdue(pageable);
-		List<CheckoutDto> checkouts = CheckoutMapper.INSTANCE.toDtoList(page.getContent());
-		return new PageImpl<>(checkouts, page.getPageable(), page.getTotalElements());
+		return new PagedModel<>(CheckoutMapper.INSTANCE.toDtoPage(page));
 	}
 
 }

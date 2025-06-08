@@ -18,9 +18,13 @@ package net.ttddyy.book.libraryservice.book.category;
 
 import java.util.List;
 
+import net.ttddyy.book.libraryservice.checkout.history.CheckoutHistory;
+import net.ttddyy.book.libraryservice.checkout.history.CheckoutHistoryDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+
+import org.springframework.data.domain.Page;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -34,5 +38,9 @@ public interface BookCategoryMapper {
 
 	@Mapping(target = "cCodeDigits", source = "CCodeDigits")
 	BookCategoryDto toDto(BookCategory category);
+
+	default Page<BookCategoryDto> toDtoPage(Page<BookCategory> page) {
+		return page.map(this::toDto);
+	}
 
 }

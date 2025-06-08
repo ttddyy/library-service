@@ -28,6 +28,8 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
+import org.springframework.data.domain.Page;
+
 /**
  * Mappings between entity and dto for books.
  *
@@ -62,6 +64,10 @@ public interface BookMapper {
 			book.setLostDate(dto.missing() ? LocalDate.now(clock) : null);
 		}
 		return book;
+	}
+
+	default Page<BookDto> toDtoPage(Page<Book> page) {
+		return page.map(this::toDto);
 	}
 
 }

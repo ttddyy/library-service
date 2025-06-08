@@ -21,6 +21,8 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+import org.springframework.data.domain.Page;
+
 /**
  * @author Tadaya Tsuyukubo
  */
@@ -32,5 +34,9 @@ public interface MemberMapper {
 	MemberDto toDto(Member member);
 
 	List<MemberDto> toDtoList(List<Member> entities);
+
+	default Page<MemberDto> toDtoPage(Page<Member> page) {
+		return page.map(this::toDto);
+	}
 
 }

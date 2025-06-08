@@ -21,8 +21,8 @@ import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,16 +45,16 @@ class CheckoutLimitScheduleController {
 	}
 
 	@GetMapping("/api/checkouts/limits/schedules")
-	Page<CheckoutLimitScheduleDto> list(@ParameterObject Pageable pageable) {
+	PagedModel<CheckoutLimitScheduleDto> list(@ParameterObject Pageable pageable) {
 		return list(null, pageable);
 	}
 
 	@GetMapping("/api/checkouts/limits/schedules/{schoolId}")
-	Page<CheckoutLimitScheduleDto> list(@PathVariable @Nullable String schoolId, @ParameterObject Pageable pageable) {
+	PagedModel<CheckoutLimitScheduleDto> list(@PathVariable @Nullable String schoolId,
+			@ParameterObject Pageable pageable) {
 		// TODO: check size limit
 		Page<CheckoutLimitSchedule> page = this.checkoutLimitScheduleService.list(schoolId, pageable);
-		List<CheckoutLimitScheduleDto> contents = CheckoutLimitScheduleMapper.INSTANCE.toDtoList(page.getContent());
-		return new PageImpl<>(contents, page.getPageable(), page.getTotalElements());
+		return new PagedModel<>(CheckoutLimitScheduleMapper.INSTANCE.toDtoPage(page));
 	}
 
 	@PostMapping("/api/checkouts/limits/schedules")

@@ -16,13 +16,11 @@
 
 package net.ttddyy.book.libraryservice.book.category;
 
-import java.util.List;
-
 import org.springdoc.core.annotations.ParameterObject;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,15 +41,14 @@ class BookCategoryController {
 	}
 
 	@GetMapping("/api/books/categories")
-	Page<BookCategoryDto> list(@ParameterObject Pageable pageable) {
+	PagedModel<BookCategoryDto> list(@ParameterObject Pageable pageable) {
 		return list(null, pageable);
 	}
 
 	@GetMapping("/api/books/categories/{schoolId}")
-	Page<BookCategoryDto> list(@PathVariable @Nullable String schoolId, @ParameterObject Pageable pageable) {
+	PagedModel<BookCategoryDto> list(@PathVariable @Nullable String schoolId, @ParameterObject Pageable pageable) {
 		Page<BookCategory> page = this.categoryService.list(schoolId, pageable);
-		List<BookCategoryDto> categories = BookCategoryMapper.INSTANCE.toDtoList(page.getContent());
-		return new PageImpl<>(categories, page.getPageable(), page.getTotalElements());
+		return new PagedModel<>(BookCategoryMapper.INSTANCE.toDtoPage(page));
 	}
 
 }

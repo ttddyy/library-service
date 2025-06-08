@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -135,8 +134,6 @@ class CheckoutControllerMockMvcTests {
 		// https://github.com/spring-cloud/spring-cloud-openfeign/issues/1018#issuecomment-2053878807
 		given(this.checkoutService.overdue(any())).willReturn(new PageImpl<>(List.of(checkout), Pageable.ofSize(1), 1));
 
-		ParameterizedTypeReference<Page<CheckoutDto>> typeRef = new ParameterizedTypeReference<>() {
-		};
 		this.webTestClient.get()
 			.uri("/api/checkouts/overdue")
 			.headers((header) -> header.setBasicAuth("user", "pass"))
@@ -145,16 +142,13 @@ class CheckoutControllerMockMvcTests {
 			.isOk()
 			.expectHeader()
 			.contentType(MediaType.APPLICATION_JSON)
-			.expectBody(typeRef)
-			.consumeWith(result -> {
-				Page<CheckoutDto> page = result.getResponseBody();
-				assertThat(page).isNotNull();
-				assertThat(page.getTotalElements()).isEqualTo(1);
-				assertThat(page.getContent()).first().satisfies((dto) -> {
-					assertThat(dto.bookId()).isEqualTo(bookId);
-					assertThat(dto.memberId()).isEqualTo(memberId);
-				});
-			});
+			.expectBody()
+			.jsonPath("page.totalElements")
+			.isEqualTo(1)
+			.jsonPath("content[0].bookId")
+			.isEqualTo(bookId)
+			.jsonPath("content[0].memberId")
+			.isEqualTo(memberId);
 	}
 
 }

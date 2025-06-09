@@ -26,8 +26,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedModel;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,12 +51,11 @@ class BookCategoryControllerDBTests {
 	@Test
 	void list() {
 		Statistics statistics = this.sessionFactory.getStatistics();
-		PagedModel<BookCategoryDto> page;
+		Page<BookCategoryDto> page;
 
 		page = this.controller.list(Pageable.unpaged());
 		assertThat(page).isNotNull();
-		assertThat(page.getMetadata()).isNotNull();
-		assertThat(page.getMetadata().totalElements()).isEqualTo(45);
+		assertThat(page.getTotalElements()).isEqualTo(45);
 
 		assertThat(statistics.getQueryExecutionCount()).isEqualTo(1);
 
@@ -64,8 +63,7 @@ class BookCategoryControllerDBTests {
 
 		page = this.controller.list("river", Pageable.unpaged());
 		assertThat(page).isNotNull();
-		assertThat(page.getMetadata()).isNotNull();
-		assertThat(page.getMetadata().totalElements()).isEqualTo(13);
+		assertThat(page.getTotalElements()).isEqualTo(13);
 
 		assertThat(statistics.getQueryExecutionCount()).isEqualTo(1);
 	}

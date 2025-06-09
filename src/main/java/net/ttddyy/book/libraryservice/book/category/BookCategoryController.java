@@ -20,7 +20,6 @@ import org.springdoc.core.annotations.ParameterObject;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedModel;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,14 +40,14 @@ class BookCategoryController {
 	}
 
 	@GetMapping("/api/books/categories")
-	PagedModel<BookCategoryDto> list(@ParameterObject Pageable pageable) {
+	Page<BookCategoryDto> list(@ParameterObject Pageable pageable) {
 		return list(null, pageable);
 	}
 
 	@GetMapping("/api/books/categories/{schoolId}")
-	PagedModel<BookCategoryDto> list(@PathVariable @Nullable String schoolId, @ParameterObject Pageable pageable) {
+	Page<BookCategoryDto> list(@PathVariable @Nullable String schoolId, @ParameterObject Pageable pageable) {
 		Page<BookCategory> page = this.categoryService.list(schoolId, pageable);
-		return new PagedModel<>(BookCategoryMapper.INSTANCE.toDtoPage(page));
+		return BookCategoryMapper.INSTANCE.toDtoPage(page);
 	}
 
 }

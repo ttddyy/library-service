@@ -24,7 +24,6 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedModel;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -86,7 +85,7 @@ class BookController {
 
 	@GetMapping("/api/books/search")
 	@Operation(description = "Search Books. When multiple parameters are provided, they work as AND conditions.")
-	PagedModel<BookDto> search(
+	Page<BookDto> search(
 	// @formatter:off
 			@Nullable @RequestParam String schoolId,
 			@Nullable @RequestParam String isbn,
@@ -101,7 +100,7 @@ class BookController {
 	) {
 		Page<Book> page = this.bookService.search(schoolId, isbn, title, titleKana, author, authorKana, publisher,
 				categoryId, pageable);
-		return new PagedModel<>(BookMapper.INSTANCE.toDtoPage(page));
+		return BookMapper.INSTANCE.toDtoPage(page);
 	}
 
 }

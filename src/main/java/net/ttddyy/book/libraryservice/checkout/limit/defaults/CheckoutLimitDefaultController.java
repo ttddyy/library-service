@@ -22,7 +22,6 @@ import org.springdoc.core.annotations.ParameterObject;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -43,10 +42,10 @@ class CheckoutLimitDefaultController {
 
 	// Since this is a small set of data, no filtering for school-id for listing
 	@GetMapping("/api/checkouts/limits/defaults")
-	PagedModel<CheckoutLimitDefaultDto> list(@ParameterObject Pageable pageable) {
+	Page<CheckoutLimitDefaultDto> list(@ParameterObject Pageable pageable) {
 		// TODO: check size limit
 		Page<CheckoutLimitDefault> page = this.checkoutLimitDefaultService.list(pageable);
-		return new PagedModel<>(CheckoutLimitDefaultMapper.INSTANCE.toDtoPage(page));
+		return CheckoutLimitDefaultMapper.INSTANCE.toDtoPage(page);
 	}
 
 	@PutMapping("/api/checkouts/limits/defaults")

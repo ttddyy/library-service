@@ -24,7 +24,6 @@ import org.springdoc.core.converters.models.PageableAsQueryParam;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -74,7 +73,7 @@ public class CheckoutHistoryController {
 		else {
 			page = this.checkoutHistoryService.listByMember(memberId, pageable);
 		}
-		return ResponseEntity.ok(new PagedModel<>(CheckoutHistoryMapper.INSTANCE.toDtoPage(page)));
+		return ResponseEntity.ok(CheckoutHistoryMapper.INSTANCE.toDtoPage(page));
 	}
 
 }

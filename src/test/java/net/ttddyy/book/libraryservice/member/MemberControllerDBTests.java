@@ -25,9 +25,9 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PagedModel;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -77,7 +77,7 @@ class MemberControllerDBTests {
 		this.entityManager.flush();
 
 		PageRequest pageable;
-		PagedModel<MemberDto> result;
+		Page<MemberDto> result;
 
 		// get all
 		pageable = PageRequest.of(0, 10, Sort.by("id"));
@@ -93,23 +93,19 @@ class MemberControllerDBTests {
 		pageable = PageRequest.of(1, 1, Sort.by("id"));
 		result = this.controller.list(null, pageable);
 		assertThat(result.getContent()).isNotNull().extracting(MemberDto::id).containsExactly(20L);
-		assertThat(result.getMetadata()).isNotNull().satisfies((metadata) -> {
-			assertThat(metadata.size()).isEqualTo(1);
-			assertThat(metadata.number()).isEqualTo(1);
-			assertThat(metadata.totalPages()).isEqualTo(3);
-			assertThat(metadata.totalElements()).isEqualTo(3);
-		});
+		assertThat(result.getSize()).isEqualTo(1);
+		assertThat(result.getNumber()).isEqualTo(1);
+		assertThat(result.getTotalPages()).isEqualTo(3);
+		assertThat(result.getTotalElements()).isEqualTo(3);
 
 		// with filter and pagination
 		pageable = PageRequest.of(1, 1, Sort.by("id"));
 		result = this.controller.list("school-B", pageable);
 		assertThat(result.getContent()).isNotNull().extracting(MemberDto::id).containsExactly(30L);
-		assertThat(result.getMetadata()).isNotNull().satisfies((metadata) -> {
-			assertThat(metadata.size()).isEqualTo(1);
-			assertThat(metadata.number()).isEqualTo(1);
-			assertThat(metadata.totalPages()).isEqualTo(2);
-			assertThat(metadata.totalElements()).isEqualTo(2);
-		});
+		assertThat(result.getSize()).isEqualTo(1);
+		assertThat(result.getNumber()).isEqualTo(1);
+		assertThat(result.getTotalPages()).isEqualTo(2);
+		assertThat(result.getTotalElements()).isEqualTo(2);
 	}
 
 }

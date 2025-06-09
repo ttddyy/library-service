@@ -23,7 +23,6 @@ import org.springdoc.core.annotations.ParameterObject;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedModel;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -61,17 +60,17 @@ public class CheckoutController {
 
 	// TODO: memberId has higher priority than schoolId
 	@GetMapping({ "/api/checkouts" })
-	PagedModel<CheckoutDto> list(@RequestParam(required = false) @Nullable Long memberId,
+	Page<CheckoutDto> list(@RequestParam(required = false) @Nullable Long memberId,
 			@RequestParam(required = false) @Nullable String schoolId, @ParameterObject Pageable pageable) {
 		Page<Checkout> page = this.checkoutService.list(memberId, schoolId, pageable);
-		return new PagedModel<>(CheckoutMapper.INSTANCE.toDtoPage(page));
+		return CheckoutMapper.INSTANCE.toDtoPage(page);
 	}
 
 	@GetMapping({ "/api/checkouts/overdue" })
-	PagedModel<CheckoutDto> overdue(@ParameterObject Pageable pageable) {
+	Page<CheckoutDto> overdue(@ParameterObject Pageable pageable) {
 		// If response json requires more info, create a new dedicated dto class
 		Page<Checkout> page = this.checkoutService.overdue(pageable);
-		return new PagedModel<>(CheckoutMapper.INSTANCE.toDtoPage(page));
+		return CheckoutMapper.INSTANCE.toDtoPage(page);
 	}
 
 }

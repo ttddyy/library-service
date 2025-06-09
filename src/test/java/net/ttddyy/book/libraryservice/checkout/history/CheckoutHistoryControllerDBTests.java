@@ -27,9 +27,9 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -109,9 +109,9 @@ class CheckoutHistoryControllerDBTests {
 	@Test
 	void byBookId() {
 		ResponseEntity<?> response = this.controller.history(2L, null, Pageable.unpaged());
-		assertThat(response.getBody()).isInstanceOfSatisfying(PagedModel.class, (pagedModel) -> {
-			assertThat(pagedModel.getContent()).hasSize(1);
-			assertThat(pagedModel.getContent().get(0)).isInstanceOfSatisfying(CheckoutHistoryDto.class, (dto) -> {
+		assertThat(response.getBody()).isInstanceOfSatisfying(Page.class, (page) -> {
+			assertThat(page.getContent()).hasSize(1);
+			assertThat(page.getContent().get(0)).isInstanceOfSatisfying(CheckoutHistoryDto.class, (dto) -> {
 				assertThat(dto.checkoutDate()).isEqualTo("2020-02-03");
 				assertThat(dto.bookId()).isEqualTo(2);
 				assertThat(dto.book().title()).isEqualTo("bar");
@@ -125,12 +125,12 @@ class CheckoutHistoryControllerDBTests {
 	void byMemberId() {
 		ResponseEntity<?> response = this.controller.history(null, 10L,
 				Pageable.unpaged(Sort.by("book.id").ascending()));
-		assertThat(response.getBody()).isInstanceOfSatisfying(PagedModel.class, (pagedModel) -> {
-			assertThat(pagedModel.getContent()).hasSize(2);
-			assertThat(pagedModel.getContent().get(0)).isInstanceOfSatisfying(CheckoutHistoryDto.class, (dto) -> {
+		assertThat(response.getBody()).isInstanceOfSatisfying(Page.class, (page) -> {
+			assertThat(page.getContent()).hasSize(2);
+			assertThat(page.getContent().get(0)).isInstanceOfSatisfying(CheckoutHistoryDto.class, (dto) -> {
 				assertThat(dto.bookId()).isEqualTo(1);
 			});
-			assertThat(pagedModel.getContent().get(1)).isInstanceOfSatisfying(CheckoutHistoryDto.class, (dto) -> {
+			assertThat(page.getContent().get(1)).isInstanceOfSatisfying(CheckoutHistoryDto.class, (dto) -> {
 				assertThat(dto.bookId()).isEqualTo(2);
 			});
 		});

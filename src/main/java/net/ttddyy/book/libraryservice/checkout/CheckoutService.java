@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Set;
 
 import net.ttddyy.book.libraryservice.book.Book;
-import net.ttddyy.book.libraryservice.checkout.Activity.ActivityType;
 import net.ttddyy.book.libraryservice.checkout.limit.CheckoutLimit;
 import net.ttddyy.book.libraryservice.checkout.limit.CheckoutLimitService;
 import net.ttddyy.book.libraryservice.member.Member;
@@ -53,15 +52,12 @@ public class CheckoutService {
 
 	private final CheckoutLimitService checkoutLimitService;
 
-	private final ActivityRepository activityRepository;
-
 	public CheckoutService(Clock clock, CheckoutRepository checkoutRepository, MemberRepository memberRepository,
-			CheckoutLimitService checkoutLimitService, ActivityRepository activityRepository) {
+			CheckoutLimitService checkoutLimitService) {
 		this.clock = clock;
 		this.checkoutRepository = checkoutRepository;
 		this.memberRepository = memberRepository;
 		this.checkoutLimitService = checkoutLimitService;
-		this.activityRepository = activityRepository;
 	}
 
 	@Transactional
@@ -86,7 +82,6 @@ public class CheckoutService {
 
 		LocalDate today = LocalDate.now(this.clock);
 		List<Checkout> checkouts = new ArrayList<>();
-		List<Activity> activities = new ArrayList<>();
 		for (Long bookId : bookIds) {
 			CheckoutId id = new CheckoutId(memberId, bookId);
 			Checkout checkout = new Checkout();
@@ -103,12 +98,6 @@ public class CheckoutService {
 			checkout.setBook(book);
 
 			checkouts.add(checkout);
-
-			Activity activity = new Activity();
-			activity.setBookId(bookId);
-			activity.setMemberId(memberId);
-			activity.setType(ActivityType.CHECK_OUT);
-			activities.add(activity);
 		}
 		this.checkoutRepository.saveAll(checkouts);
 		// TODO: consider the feature
@@ -117,15 +106,9 @@ public class CheckoutService {
 
 	@Transactional
 	public void bulkReturn(Set<Long> bookIds) {
-		List<Activity> activities = new ArrayList<>();
 		Set<Long> batch = new HashSet<>();
 		int i = 1;
 		for (Long bookId : bookIds) {
-			Activity activity = new Activity();
-			activity.setBookId(bookId);
-			activity.setType(ActivityType.RETURN);
-			activities.add(activity);
-
 			batch.add(bookId);
 			if (i++ % DEFAULT_DELETE_BATCH_SIZE == 0) {
 				this.checkoutRepository.deleteAllByIdBookIdIn(batch);
@@ -133,8 +116,6 @@ public class CheckoutService {
 			}
 		}
 		this.checkoutRepository.deleteAllByIdBookIdIn(batch);
-		// TODO: consider the feature
-		// this.activityRepository.saveAll(activities);
 	}
 
 	Page<Checkout> list(@Nullable Long memberId, @Nullable String schoolId, Pageable pageable) {

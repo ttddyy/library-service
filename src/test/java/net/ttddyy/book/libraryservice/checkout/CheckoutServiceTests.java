@@ -17,7 +17,6 @@
 package net.ttddyy.book.libraryservice.checkout;
 
 import java.time.Clock;
-import java.util.List;
 import java.util.Set;
 
 import net.ttddyy.book.libraryservice.checkout.limit.CheckoutLimit;
@@ -25,7 +24,6 @@ import net.ttddyy.book.libraryservice.checkout.limit.CheckoutLimitService;
 import net.ttddyy.book.libraryservice.member.Member;
 import net.ttddyy.book.libraryservice.member.MemberRepository;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -44,23 +42,13 @@ class CheckoutServiceTests {
 		CheckoutRepository checkoutRepository = mock(CheckoutRepository.class);
 		MemberRepository memberRepository = mock(MemberRepository.class);
 		CheckoutLimitService checkoutLimitService = mock(CheckoutLimitService.class);
-		ActivityRepository activityRepository = mock(ActivityRepository.class);
 		CheckoutService checkoutService = new CheckoutService(clock, checkoutRepository, memberRepository,
-				checkoutLimitService, activityRepository);
+				checkoutLimitService);
 
 		Set<Long> bookIds = Set.of(1L, 2L, 3L);
 		checkoutService.bulkReturn(bookIds);
 
-		ArgumentCaptor<List<Activity>> activitiesCaptor = ArgumentCaptor.forClass(List.class);
-
 		verify(checkoutRepository).deleteAllByIdBookIdIn(bookIds);
-		// verify(activityRepository).saveAll(activitiesCaptor.capture());
-		//
-		// List<Activity> capturedActivities = activitiesCaptor.getValue();
-		// assertThat(capturedActivities).hasSize(3);
-		// assertThat(capturedActivities).extracting(Activity::getBookId).containsExactlyInAnyOrder(1L,
-		// 2L, 3L);
-		// assertThat(capturedActivities).extracting(Activity::getType).containsOnly(ActivityType.RETURN);
 	}
 
 	@Test
@@ -69,7 +57,6 @@ class CheckoutServiceTests {
 		CheckoutRepository checkoutRepository = mock(CheckoutRepository.class);
 		MemberRepository memberRepository = mock(MemberRepository.class);
 		CheckoutLimitService checkoutLimitService = mock(CheckoutLimitService.class);
-		ActivityRepository activityRepository = mock(ActivityRepository.class);
 
 		CheckoutLimit limit = new CheckoutLimit(6, 3);
 
@@ -84,7 +71,7 @@ class CheckoutServiceTests {
 		given(checkoutLimitService.getCheckoutLimit(schoolId, member.getGrade())).willReturn(limit);
 
 		CheckoutService checkoutService = new CheckoutService(clock, checkoutRepository, memberRepository,
-				checkoutLimitService, activityRepository);
+				checkoutLimitService);
 
 		// it exceeds the max 6 books. 5+3
 		Set<Long> bookIds = Set.of(1L, 2L, 3L);

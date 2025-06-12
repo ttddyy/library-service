@@ -106,23 +106,6 @@ CREATE TABLE limits
     PRIMARY KEY (role, property)
 );
 
-CREATE TABLE schedules
-(
-    date                 VARCHAR(16) NOT NULL,
-    school               VARCHAR(8)  NOT NULL,
-    k_max_books          INT         NOT NULL,
-    k_max_checkout_weeks INT         NOT NULL,
-    e_max_books          INT         NOT NULL,
-    e_max_checkout_weeks INT         NOT NULL,
-    m_max_books          INT         NOT NULL,
-    m_max_checkout_weeks INT         NOT NULL,
-    h_max_books          INT         NOT NULL,
-    h_max_checkout_weeks INT         NOT NULL,
-    o_max_books          INT         NOT NULL,
-    o_max_checkout_weeks INT         NOT NULL,
-    PRIMARY KEY (date, school)
-);
-
 
 CREATE TABLE activities
 (
@@ -163,7 +146,3 @@ CREATE TABLE checkout_limit_schedules
     CONSTRAINT uc_checkout_limit_schedules__school_grade_date UNIQUE (school_id, grade, schedule_date),
     CONSTRAINT fk_checkout_limit_schedules__schools_id FOREIGN KEY (school_id) REFERENCES schools (id)
 );
-
-
--- TODO: for existing tables:
---  * Add version column for ones that app updates

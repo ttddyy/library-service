@@ -37,11 +37,6 @@ CREATE TRIGGER update_limits_updated_at
     FOR EACH ROW
 EXECUTE FUNCTION moddatetime(updated_at);
 
-CREATE TRIGGER update_schedule_updated_at
-    BEFORE UPDATE ON schedules
-    FOR EACH ROW
-EXECUTE FUNCTION moddatetime(updated_at);
-
 CREATE TRIGGER update_activities_updated_at
     BEFORE UPDATE ON activities
     FOR EACH ROW

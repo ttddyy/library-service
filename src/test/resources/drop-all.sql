@@ -1,7 +1,6 @@
 DROP TABLE IF EXISTS checkout_limit_schedules;
 DROP TABLE IF EXISTS checkout_limit_defaults;
 DROP TABLE IF EXISTS activities;
-DROP TABLE IF EXISTS schedules;
 DROP TABLE IF EXISTS limits;
 DROP TABLE IF EXISTS checkouts_history;
 DROP TABLE IF EXISTS checkouts;

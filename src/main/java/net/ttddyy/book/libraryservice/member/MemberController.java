@@ -17,12 +17,12 @@
 package net.ttddyy.book.libraryservice.member;
 
 import org.springdoc.core.annotations.ParameterObject;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -37,15 +37,9 @@ class MemberController {
 		this.memberService = memberService;
 	}
 
-	@GetMapping({ "/api/members" })
-	Page<MemberDto> list(@ParameterObject Pageable pageable) {
-		// OpenAPI spec requires path-variable to be required.
-		// To workaround the limitation, it needs to specify separate endpoint.
-		return list(null, pageable);
-	}
-
-	@GetMapping("/api/members/{schoolId}")
-	Page<MemberDto> list(@PathVariable @Nullable String schoolId, @ParameterObject Pageable pageable) {
+	@GetMapping("/api/members")
+	Page<MemberDto> list(@RequestParam(required = false) @Nullable String schoolId,
+			@ParameterObject Pageable pageable) {
 		Page<Member> page = this.memberService.list(schoolId, pageable);
 		return MemberMapper.INSTANCE.toDtoPage(page);
 	}

@@ -96,7 +96,7 @@ class BookController {
 			@Nullable @RequestParam String publisher,
 			@Nullable @RequestParam Long categoryId,
 			@ParameterObject Pageable pageable
-// @formatter:on
+	// @formatter:on
 	) {
 		Page<Book> page = this.bookService.search(schoolId, isbn, title, titleKana, author, authorKana, publisher,
 				categoryId, pageable);

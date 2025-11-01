@@ -82,7 +82,7 @@ class CheckoutLimitDefaultControllerDBTests {
 		assertThat(updated.schoolId()).isEqualTo("ocean");
 		assertThat(updated.grade()).isEqualTo(3);
 		assertThat(updated.maxBooks()).isEqualTo(6);
-		assertThat(updated.maxWeeks()).isEqualTo(4);
+		assertThat(updated.maxDays()).isEqualTo(4);
 
 		// get from DB
 		entityManager.clear();
@@ -91,7 +91,7 @@ class CheckoutLimitDefaultControllerDBTests {
 		assertThat(updatedEntity.getGrade()).isEqualTo(3);
 		assertThat(updatedEntity.getSchoolId()).isEqualTo("ocean");
 		assertThat(updatedEntity.getMaxBooks()).isEqualTo(6);
-		assertThat(updatedEntity.getMaxWeeks()).isEqualTo(4);
+		assertThat(updatedEntity.getMaxDays()).isEqualTo(4);
 	}
 
 	@Test
@@ -117,19 +117,19 @@ class CheckoutLimitDefaultControllerDBTests {
 		entity1.setGrade(1);
 		entity1.setSchoolId("river");
 		entity1.setMaxBooks(11);
-		entity1.setMaxWeeks(111);
+		entity1.setMaxDays(111);
 		CheckoutLimitDefault entity2 = new CheckoutLimitDefault();
 		entity2.setId(200L);
 		entity2.setGrade(2);
 		entity2.setSchoolId("river");
 		entity2.setMaxBooks(22);
-		entity2.setMaxWeeks(222);
+		entity2.setMaxDays(222);
 		CheckoutLimitDefault entity3 = new CheckoutLimitDefault();
 		entity3.setId(300L);
 		entity3.setGrade(3);
 		entity3.setSchoolId("river");
 		entity3.setMaxBooks(33);
-		entity3.setMaxWeeks(333);
+		entity3.setMaxDays(333);
 		this.entityManager.persist(entity1);
 		this.entityManager.persist(entity2);
 		this.entityManager.persist(entity3);

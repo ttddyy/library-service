@@ -51,7 +51,7 @@ public class CheckoutLimitSchedule {
 
 	private Integer maxBooks;
 
-	private Integer maxWeeks;
+	private Integer maxDays;
 
 	@Column(insertable = false, updatable = false)
 	private Instant createdAt;
@@ -107,12 +107,12 @@ public class CheckoutLimitSchedule {
 		this.maxBooks = maxBooks;
 	}
 
-	public Integer getMaxWeeks() {
-		return this.maxWeeks;
+	public Integer getMaxDays() {
+		return this.maxDays;
 	}
 
-	public void setMaxWeeks(Integer maxWeeks) {
-		this.maxWeeks = maxWeeks;
+	public void setMaxDays(Integer maxDays) {
+		this.maxDays = maxDays;
 	}
 
 	public Instant getCreatedAt() {

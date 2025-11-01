@@ -38,7 +38,7 @@ public class LibraryServiceProperties {
 
 		private int maxBooks;
 
-		private int maxWeeks;
+		private int maxDays;
 
 		public int getMaxBooks() {
 			return this.maxBooks;
@@ -48,12 +48,12 @@ public class LibraryServiceProperties {
 			this.maxBooks = maxBooks;
 		}
 
-		public int getMaxWeeks() {
-			return this.maxWeeks;
+		public int getMaxDays() {
+			return this.maxDays;
 		}
 
-		public void setMaxWeeks(int maxWeeks) {
-			this.maxWeeks = maxWeeks;
+		public void setMaxDays(int maxDays) {
+			this.maxDays = maxDays;
 		}
 
 	}

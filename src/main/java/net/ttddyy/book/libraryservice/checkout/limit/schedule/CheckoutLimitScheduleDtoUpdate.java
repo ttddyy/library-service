@@ -27,7 +27,7 @@ public record CheckoutLimitScheduleDtoUpdate(
 		LocalDate scheduleDate,
 		int grade, // TODO: may introduce enum
 		int maxBooks,
-		int maxWeeks,
+		int maxDays,
 		String schoolId
 // @formatter:om
 ) {

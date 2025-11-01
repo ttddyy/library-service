@@ -59,12 +59,12 @@ class CheckoutLimitScheduleServiceDBTests {
 	@Test
 	void list() {
 		String sql = """
-					INSERT INTO checkout_limit_schedules (id, school_id, grade, schedule_date, max_books, max_weeks)
-					VALUES	( 1, 'river', 0, '2020-02-03', 1, 2),
-							( 2, 'river', 0, '2020-03-03', 2, 3),
-							( 3, 'river', 0, '2020-04-03', 3, 4),
-							(10, 'ocean', 0, '2020-02-03', 11, 22),
-							(11, 'ocean', 0, '2020-03-03', 22, 33)
+					INSERT INTO checkout_limit_schedules (id, school_id, grade, schedule_date, max_books, max_days)
+					VALUES	( 1, 'river', 0, '2020-02-03', 1, 14),
+							( 2, 'river', 0, '2020-03-03', 2, 21),
+							( 3, 'river', 0, '2020-04-03', 3, 28),
+							(10, 'ocean', 0, '2020-02-03', 11, 154),
+							(11, 'ocean', 0, '2020-03-03', 22, 231)
 				""";
 		this.jdbcTemplate.update(sql);
 
@@ -86,7 +86,7 @@ class CheckoutLimitScheduleServiceDBTests {
 		entity.setGrade(1);
 		entity.setScheduleDate(LocalDate.parse("2022-02-02"));
 		entity.setMaxBooks(50);
-		entity.setMaxWeeks(60);
+		entity.setMaxDays(60);
 		List<CheckoutLimitSchedule> created = this.service.create(List.of(entity));
 		assertThat(created).hasSize(1);
 
@@ -96,7 +96,7 @@ class CheckoutLimitScheduleServiceDBTests {
 		assertThat(map).containsEntry("school_id", "river")
 			.containsEntry("grade", 1)
 			.containsEntry("max_books", 50)
-			.containsEntry("max_weeks", 60);
+			.containsEntry("max_days", 60);
 		assertThat(map.get("schedule_date")).isInstanceOfSatisfying(Date.class, (date) -> {
 			assertThat(date).isEqualTo("2022-02-02");
 		});
@@ -105,12 +105,12 @@ class CheckoutLimitScheduleServiceDBTests {
 	@Test
 	void update() {
 		String sql = """
-					INSERT INTO checkout_limit_schedules (id, school_id, grade, schedule_date, max_books, max_weeks)
-					VALUES	( 1, 'river', 0, '2020-02-03', 1, 2),
-							( 2, 'river', 0, '2020-03-03', 2, 3),
-							( 3, 'river', 0, '2020-04-03', 3, 4),
-							(10, 'ocean', 0, '2020-02-03', 11, 22),
-							(11, 'ocean', 0, '2020-03-03', 22, 33)
+					INSERT INTO checkout_limit_schedules (id, school_id, grade, schedule_date, max_books, max_days)
+					VALUES	( 1, 'river', 0, '2020-02-03', 1, 14),
+							( 2, 'river', 0, '2020-03-03', 2, 21),
+							( 3, 'river', 0, '2020-04-03', 3, 28),
+							(10, 'ocean', 0, '2020-02-03', 11, 154),
+							(11, 'ocean', 0, '2020-03-03', 22, 231)
 				""";
 		this.jdbcTemplate.update(sql);
 
@@ -122,7 +122,7 @@ class CheckoutLimitScheduleServiceDBTests {
 		assertThat(updated.getGrade()).isEqualTo(1);
 		assertThat(updated.getScheduleDate()).isEqualTo("2022-02-02");
 		assertThat(updated.getMaxBooks()).isEqualTo(50);
-		assertThat(updated.getMaxWeeks()).isEqualTo(60);
+		assertThat(updated.getMaxDays()).isEqualTo(60);
 		assertThat(updated.getSchoolId()).isEqualTo("ocean");
 
 		entityManager.flush();
@@ -131,7 +131,7 @@ class CheckoutLimitScheduleServiceDBTests {
 		assertThat(map).containsEntry("school_id", "ocean")
 			.containsEntry("grade", 1)
 			.containsEntry("max_books", 50)
-			.containsEntry("max_weeks", 60)
+			.containsEntry("max_days", 60)
 			.containsEntry("school_id", "ocean");
 		assertThat(map.get("schedule_date")).isInstanceOfSatisfying(Date.class, (date) -> {
 			assertThat(date).isEqualTo("2022-02-02");

@@ -65,8 +65,8 @@ public class CheckoutService {
 		Member member = this.memberRepository.getReferenceById(memberId);
 		CheckoutLimit checkoutLimit = this.checkoutLimitService.getCheckoutLimit(schoolId, member.getGrade());
 		int maxBooks = checkoutLimit.getMaxBooks();
-		int maxWeeks = checkoutLimit.getMaxWeeks();
-		LocalDate dueDate = LocalDate.now().plusDays(maxWeeks);
+		int maxDays = checkoutLimit.getMaxDays();
+		LocalDate dueDate = LocalDate.now().plusDays(maxDays);
 
 		if (!force) {
 			// perform validation. If it gets more complicated, move to a dedicated class.

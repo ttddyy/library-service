@@ -27,7 +27,7 @@ public record CheckoutLimitScheduleDtoCreate(
 		LocalDate scheduleDate,
 		int grade, // TODO: may introduce enum
 		int maxBooks,
-		int maxWeeks
+		int maxDays
 // @formatter:on
 ) {
 }

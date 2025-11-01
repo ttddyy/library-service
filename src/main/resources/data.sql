@@ -6,39 +6,39 @@ VALUES ('ocean', 'Ocean School'),
        ('sky', 'Sky School')
 ;
 
-INSERT INTO checkout_limit_defaults (id, school_id, grade, max_books, max_weeks)
+INSERT INTO checkout_limit_defaults (id, school_id, grade, max_books, max_days)
 VALUES -- ocean school
-       (0, 'ocean', 0, 4, 4),
-       (1, 'ocean', 1, 4, 4),
-       (2, 'ocean', 2, 4, 4),
-       (3, 'ocean', 3, 4, 4),
-       (4, 'ocean', 4, 4, 4),
-       (5, 'ocean', 5, 4, 4),
-       (6, 'ocean', 6, 4, 4),
-       (7, 'ocean', 99, 4, 4),  -- for parents/teachers
+       (0, 'ocean', 0, 4, 28),
+       (1, 'ocean', 1, 4, 28),
+       (2, 'ocean', 2, 4, 28),
+       (3, 'ocean', 3, 4, 28),
+       (4, 'ocean', 4, 4, 28),
+       (5, 'ocean', 5, 4, 28),
+       (6, 'ocean', 6, 4, 28),
+       (7, 'ocean', 99, 4, 28),  -- for parents/teachers
        -- mountain school
-       (8, 'mountain', 7, 4, 2),
-       (9, 'mountain', 8, 4, 2),
-       (10, 'mountain', 9, 4, 2),
-       (11, 'mountain', 10, 4, 2),
-       (12, 'mountain', 11, 4, 2),
-       (13, 'mountain', 99, 4, 2), -- for parents/teachers
+       (8, 'mountain', 7, 4, 14),
+       (9, 'mountain', 8, 4, 14),
+       (10, 'mountain', 9, 4, 14),
+       (11, 'mountain', 10, 4, 14),
+       (12, 'mountain', 11, 4, 14),
+       (13, 'mountain', 99, 4, 14), -- for parents/teachers
        -- river school
-       (14, 'river', 0, 5, 4),
-       (15, 'river', 1, 5, 4),
-       (16, 'river', 2, 5, 4),
-       (17, 'river', 3, 5, 4),
-       (18, 'river', 4, 5, 4),
-       (19, 'river', 5, 5, 4),
-       (20, 'river', 6, 5, 4),
-       (21, 'river', 99, 5, 4), -- for parents/teachers
+       (14, 'river', 0, 5, 28),
+       (15, 'river', 1, 5, 28),
+       (16, 'river', 2, 5, 28),
+       (17, 'river', 3, 5, 28),
+       (18, 'river', 4, 5, 28),
+       (19, 'river', 5, 5, 28),
+       (20, 'river', 6, 5, 28),
+       (21, 'river', 99, 5,28), -- for parents/teachers
        -- sky school
-       (22, 'sky', 7, 5, 2),
-       (23, 'sky', 8, 5, 2),
-       (24, 'sky', 9, 5, 2),
-       (25, 'sky', 10, 5, 2),
-       (26, 'sky', 11, 5, 2),
-       (27, 'sky', 99, 5, 2) -- for parents/teachers
+       (22, 'sky', 7, 5, 14),
+       (23, 'sky', 8, 5, 14),
+       (24, 'sky', 9, 5, 14),
+       (25, 'sky', 10, 5, 14),
+       (26, 'sky', 11, 5, 14),
+       (27, 'sky', 99, 5, 14) -- for parents/teachers
 ;
 
 INSERT INTO book_categories (id, letter, name, starting_book_id, ending_book_id,

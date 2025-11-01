@@ -59,7 +59,7 @@ class CheckoutLimitServiceTests {
 		result = checkoutLimitService.getCheckoutLimit("my-school", 0);
 		assertThat(result).isNotNull();
 		assertThat(result.getMaxBooks()).isEqualTo(2);
-		assertThat(result.getMaxWeeks()).isEqualTo(15);
+		assertThat(result.getMaxDays()).isEqualTo(15);
 		verify(scheduleRepository).findByScheduleDateAndSchoolIdAndGrade(any(), anyString(), anyInt());
 		verify(defaultRepository).findBySchoolIdAndGrade(any(), anyInt());
 
@@ -68,7 +68,7 @@ class CheckoutLimitServiceTests {
 		// resolved by default
 		CheckoutLimitDefault defaultEntity = new CheckoutLimitDefault();
 		defaultEntity.setMaxBooks(10);
-		defaultEntity.setMaxWeeks(20);
+		defaultEntity.setMaxDays(20);
 		given(scheduleRepository.findByScheduleDateAndSchoolIdAndGrade(any(), anyString(), anyInt())).willReturn(null);
 		given(defaultRepository.findBySchoolIdAndGrade(any(), anyInt())).willReturn(defaultEntity);
 
@@ -76,7 +76,7 @@ class CheckoutLimitServiceTests {
 
 		assertThat(result).isNotNull();
 		assertThat(result.getMaxBooks()).isEqualTo(10);
-		assertThat(result.getMaxWeeks()).isEqualTo(20);
+		assertThat(result.getMaxDays()).isEqualTo(20);
 		verify(scheduleRepository).findByScheduleDateAndSchoolIdAndGrade(any(), anyString(), anyInt());
 		verify(defaultRepository).findBySchoolIdAndGrade(any(), anyInt());
 
@@ -85,7 +85,7 @@ class CheckoutLimitServiceTests {
 		// resolved by scheduled
 		CheckoutLimitSchedule scheduledEntity = new CheckoutLimitSchedule();
 		scheduledEntity.setMaxBooks(100);
-		scheduledEntity.setMaxWeeks(200);
+		scheduledEntity.setMaxDays(200);
 		given(scheduleRepository.findByScheduleDateAndSchoolIdAndGrade(any(), anyString(), anyInt()))
 			.willReturn(scheduledEntity);
 
@@ -93,7 +93,7 @@ class CheckoutLimitServiceTests {
 
 		assertThat(result).isNotNull();
 		assertThat(result.getMaxBooks()).isEqualTo(100);
-		assertThat(result.getMaxWeeks()).isEqualTo(200);
+		assertThat(result.getMaxDays()).isEqualTo(200);
 		verify(scheduleRepository).findByScheduleDateAndSchoolIdAndGrade(any(), anyString(), anyInt());
 		verifyNoInteractions(defaultRepository);
 	}

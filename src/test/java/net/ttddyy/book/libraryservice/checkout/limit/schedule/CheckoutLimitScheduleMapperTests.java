@@ -40,7 +40,7 @@ class CheckoutLimitScheduleMapperTests {
 		assertThat(result).hasSize(2);
 		assertThat(result).extracting(CheckoutLimitSchedule::getGrade).containsExactly(1, 10);
 		assertThat(result).extracting(CheckoutLimitSchedule::getMaxBooks).containsExactly(2, 20);
-		assertThat(result).extracting(CheckoutLimitSchedule::getMaxWeeks).containsExactly(3, 30);
+		assertThat(result).extracting(CheckoutLimitSchedule::getMaxDays).containsExactly(3, 30);
 		assertThat(result).extracting(CheckoutLimitSchedule::getSchoolId).containsExactly("foo-school", "bar-school");
 	}
 

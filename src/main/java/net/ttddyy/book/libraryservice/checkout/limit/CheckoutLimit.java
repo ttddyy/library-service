@@ -25,19 +25,19 @@ public class CheckoutLimit {
 
 	private int maxBooks;
 
-	private int maxWeeks;
+	private int maxDays;
 
-	public CheckoutLimit(int maxBooks, int maxWeeks) {
+	public CheckoutLimit(int maxBooks, int maxDays) {
 		this.maxBooks = maxBooks;
-		this.maxWeeks = maxWeeks;
+		this.maxDays = maxDays;
 	}
 
 	public int getMaxBooks() {
 		return this.maxBooks;
 	}
 
-	public int getMaxWeeks() {
-		return this.maxWeeks;
+	public int getMaxDays() {
+		return this.maxDays;
 	}
 
 }

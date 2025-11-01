@@ -43,17 +43,17 @@ public class CheckoutLimitService {
 
 	private final int maxBooks;
 
-	private final int maxWeeks;
+	private final int maxDays;
 
 	public CheckoutLimitService(Clock clock, CheckoutLimitDefaultRepository limitDefaultRepository,
 			CheckoutLimitScheduleRepository limitScheduleRepository,
 			@Value("${library-service.checkout.max-books}") int maxBooks,
-			@Value("${library-service.checkout.max-weeks}") int maxWeeks) {
+			@Value("${library-service.checkout.max-days}") int maxDays) {
 		this.clock = clock;
 		this.limitDefaultRepository = limitDefaultRepository;
 		this.limitScheduleRepository = limitScheduleRepository;
 		this.maxBooks = maxBooks;
-		this.maxWeeks = maxWeeks;
+		this.maxDays = maxDays;
 	}
 
 	public CheckoutLimit getCheckoutLimit(String schoolId, int grade) {
@@ -62,15 +62,15 @@ public class CheckoutLimitService {
 		CheckoutLimitSchedule schedule = this.limitScheduleRepository.findByScheduleDateAndSchoolIdAndGrade(today,
 				schoolId, grade);
 		if (schedule != null) {
-			return new CheckoutLimit(schedule.getMaxBooks(), schedule.getMaxWeeks());
+			return new CheckoutLimit(schedule.getMaxBooks(), schedule.getMaxDays());
 		}
 		// check school default
 		CheckoutLimitDefault schoolDefault = this.limitDefaultRepository.findBySchoolIdAndGrade(schoolId, grade);
 		if (schoolDefault != null) {
-			return new CheckoutLimit(schoolDefault.getMaxBooks(), schoolDefault.getMaxWeeks());
+			return new CheckoutLimit(schoolDefault.getMaxBooks(), schoolDefault.getMaxDays());
 		}
 		// fallback to the system default
-		return new CheckoutLimit(this.maxBooks, this.maxWeeks);
+		return new CheckoutLimit(this.maxBooks, this.maxDays);
 	}
 
 }

@@ -25,7 +25,7 @@ public record CheckoutLimitDefaultDtoUpdateBulk(
 // @formatter:off
 		long id,
 		int maxBooks,
-		int maxWeeks
+		int maxDays
 // @formatter:on
 ) {
 }

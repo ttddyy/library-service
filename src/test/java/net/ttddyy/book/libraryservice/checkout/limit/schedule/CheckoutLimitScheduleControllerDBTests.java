@@ -73,19 +73,19 @@ class CheckoutLimitScheduleControllerDBTests {
 	@Test
 	void bulkUpdate() {
 		String sql = """
-					INSERT INTO checkout_limit_schedules (id, school_id, grade, schedule_date, max_books, max_weeks)
-					VALUES	( 1, 'river', 0, '2020-02-03', 1, 2),
-							( 2, 'river', 0, '2020-03-03', 2, 3),
-							( 3, 'river', 0, '2020-04-03', 3, 4),
-							(10, 'ocean', 0, '2020-02-03', 11, 22),
-							(11, 'ocean', 0, '2020-03-03', 22, 33)
+					INSERT INTO checkout_limit_schedules (id, school_id, grade, schedule_date, max_books, max_days)
+					VALUES	( 1, 'river', 0, '2020-02-03', 1, 14),
+							( 2, 'river', 0, '2020-03-03', 2, 21),
+							( 3, 'river', 0, '2020-04-03', 3, 28),
+							(10, 'ocean', 0, '2020-02-03', 11, 154),
+							(11, 'ocean', 0, '2020-03-03', 22, 231)
 				""";
 		this.jdbcTemplate.update(sql);
 
 		CheckoutLimitScheduleDtoUpdate dto1 = new CheckoutLimitScheduleDtoUpdate(2, LocalDate.parse("2020-01-01"), 1, 2,
-				3, "river");
+				21, "river");
 		CheckoutLimitScheduleDtoUpdate dto2 = new CheckoutLimitScheduleDtoUpdate(3, LocalDate.parse("2022-02-02"), 2, 5,
-				6, "mountain");
+				42, "mountain");
 		List<CheckoutLimitScheduleDtoUpdate> request = List.of(dto1, dto2);
 
 		List<CheckoutLimitScheduleDto> updated = this.controller.bulkUpdate(request);
@@ -99,7 +99,7 @@ class CheckoutLimitScheduleControllerDBTests {
 		assertThat(map).containsEntry("school_id", "river")
 			.containsEntry("grade", 1)
 			.containsEntry("max_books", 2)
-			.containsEntry("max_weeks", 3);
+			.containsEntry("max_days", 21);
 		assertThat(map.get("schedule_date")).isInstanceOfSatisfying(Date.class, (date) -> {
 			assertThat(date).isEqualTo("2020-01-01");
 		});
@@ -108,7 +108,7 @@ class CheckoutLimitScheduleControllerDBTests {
 		assertThat(map).containsEntry("school_id", "mountain")
 			.containsEntry("grade", 2)
 			.containsEntry("max_books", 5)
-			.containsEntry("max_weeks", 6);
+			.containsEntry("max_days", 42);
 		assertThat(map.get("schedule_date")).isInstanceOfSatisfying(Date.class, (date) -> {
 			assertThat(date).isEqualTo("2022-02-02");
 		});

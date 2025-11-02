@@ -46,10 +46,10 @@ public class CheckoutController {
 
 	@PostMapping("/api/checkouts/checkout")
 	@Operation(description = "'force' is optional (default: false)")
-	void checkout(@RequestBody String schoolId, @RequestBody long memberId, @RequestBody Set<Long> bookIds,
-			@RequestBody(required = false) boolean force) {
+	void checkout(@RequestBody CheckoutBooksDto checkoutBooksDto, @RequestParam(required = false) boolean force) {
 		// TODO: may return error due to validation
-		this.checkoutService.checkout(schoolId, memberId, bookIds, force);
+		this.checkoutService.checkout(checkoutBooksDto.schoolId(), checkoutBooksDto.memberId(),
+				checkoutBooksDto.bookIds(), force);
 	}
 
 	@PostMapping(value = "/api/checkouts/return")

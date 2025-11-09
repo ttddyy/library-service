@@ -88,6 +88,7 @@ public class BookService {
 		if (categoryId != null) {
 			BookCategory category = new BookCategory();
 			category.setId(categoryId);
+			category.setCCodeDigits(null);
 			book.setCategory(category);
 		}
 		ExampleMatcher matcher = ExampleMatcher.matching()

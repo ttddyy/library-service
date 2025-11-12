@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,6 @@
 
 package net.ttddyy.book.libraryservice.book;
 
-import java.sql.Date;
-import java.time.Instant;
-import java.util.Map;
-
 import net.ttddyy.book.libraryservice.DbTest;
 import net.ttddyy.book.libraryservice.MockClocks.MockClock;
 import org.hibernate.SessionFactory;
@@ -27,7 +23,6 @@ import org.hibernate.stat.EntityStatistics;
 import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
@@ -37,6 +32,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
+
+import java.sql.Date;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -76,12 +76,12 @@ class BookControllerDBTests {
 	void create() {
 		// category: (3, 'C', 'SJ民話', 1200000, 1299999, '民話', 'ocean', '')
 		BookDtoCreate request = new BookDtoCreate("foo", "", "foo", "", "foo", "", "foo", "river", 3);
-		BookDto result = this.controller.create(request);
+		List<BookDto> result = this.controller.create(List.of(request));
 
 		this.entityManager.flush();
 
-		assertThat(result).isNotNull();
-		assertThat(result.id()).isEqualTo(1200000);
+		assertThat(result).hasSize(1);
+		assertThat(result).first().extracting(BookDto::id).isEqualTo(1200000L);
 
 		Statistics statistics = this.sessionFactory.getStatistics();
 		EntityStatistics entityStatistics = statistics.getEntityStatistics(Book.class.getName());
@@ -92,11 +92,11 @@ class BookControllerDBTests {
 		// create another with same category(3) should get the next id
 		BookDtoCreate request2 = new BookDtoCreate("bar", "", "bar", "", "bar", "", "bar", "river", 3);
 
-		result = this.controller.create(request2);
+		result = this.controller.create(List.of(request2));
 		this.entityManager.flush();
 
-		assertThat(result).isNotNull();
-		assertThat(result.id()).isEqualTo(1200001); // next id in the range
+		assertThat(result).hasSize(1);
+		assertThat(result).first().extracting(BookDto::id).isEqualTo(1200001L);
 
 		entityStatistics = statistics.getEntityStatistics(Book.class.getName());
 		assertThat(entityStatistics.getInsertCount()).isEqualTo(1);

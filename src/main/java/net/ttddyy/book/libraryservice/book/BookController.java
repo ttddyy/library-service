@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,11 +61,11 @@ class BookController {
 	}
 
 	@PostMapping("/api/books")
-	BookDto create(BookDtoCreate input) {
+	List<BookDto> create(List<BookDtoCreate> input) {
 		// TODO: validation for required fields
-		Book toCreate = BookMapper.INSTANCE.toBook(input);
-		Book book = this.bookService.create(toCreate);
-		BookDto response = BookMapper.INSTANCE.toDto(book);
+		List<Book> toCreate = BookMapper.INSTANCE.toBookList(input);
+		List<Book> books = this.bookService.create(toCreate);
+		List<BookDto> response = BookMapper.INSTANCE.toDtoList(books);
 		return response;
 	}
 

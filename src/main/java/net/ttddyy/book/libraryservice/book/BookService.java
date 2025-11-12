@@ -29,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.Clock;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.ignoreCase;
 
@@ -115,6 +117,15 @@ public class BookService {
 		book.setCategory(category);
 		book.setMissing(false);
 		return this.bookRepository.save(book);
+	}
+
+	@Transactional(readOnly = false)
+	public List<Book> create(List<Book> books) {
+		List<Book> created = new ArrayList<>();
+		for (Book book : books) {
+			created.add(create(book));
+		}
+		return created;
 	}
 
 	@Transactional

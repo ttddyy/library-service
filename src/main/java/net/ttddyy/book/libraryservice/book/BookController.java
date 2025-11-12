@@ -16,21 +16,15 @@
 
 package net.ttddyy.book.libraryservice.book;
 
-import java.util.List;
-
 import io.swagger.v3.oas.annotations.Operation;
 import org.springdoc.core.annotations.ParameterObject;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.Nullable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -61,7 +55,7 @@ class BookController {
 	}
 
 	@PostMapping("/api/books")
-	List<BookDto> create(List<BookDtoCreate> input) {
+	List<BookDto> create(@RequestBody List<BookDtoCreate> input) {
 		// TODO: validation for required fields
 		List<Book> toCreate = BookMapper.INSTANCE.toBookList(input);
 		List<Book> books = this.bookService.create(toCreate);

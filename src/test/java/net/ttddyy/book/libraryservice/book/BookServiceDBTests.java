@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ package net.ttddyy.book.libraryservice.book;
 
 import net.ttddyy.book.libraryservice.DbTest;
 import net.ttddyy.book.libraryservice.MockClocks.System;
+import net.ttddyy.book.libraryservice.book.category.BookCategory;
 import net.ttddyy.book.libraryservice.book.category.BookCategoryService;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
@@ -29,6 +29,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -111,6 +113,54 @@ class BookServiceDBTests {
 		page = this.bookService.search("ocean", null, "no-match", null, null, null, null, 2L, Pageable.unpaged());
 		assertThat(page.getTotalElements()).isEqualTo(0);
 
+	}
+
+	@Test
+	void bulkCreate() {
+		BookCategory category2 = new BookCategory();
+		category2.setId(2L);
+		BookCategory category3 = new BookCategory();
+		category3.setId(3L);
+
+		Book bookA = new Book();
+		bookA.setCategory(category2);
+		bookA.setSchoolId("ocean");
+		bookA.setTitle("titleA");
+		bookA.setAuthor("authorA");
+		bookA.setIsbn("isbnA");
+		bookA.setPublisher("publisherA");
+
+		Book bookB = new Book();
+		bookB.setCategory(category2);
+		bookB.setSchoolId("ocean");
+		bookB.setTitle("titleB");
+		bookB.setAuthor("authorB");
+		bookB.setIsbn("isbnB");
+		bookB.setPublisher("publisherB");
+
+		Book bookC = new Book();
+		bookC.setCategory(category3);
+		bookC.setSchoolId("ocean");
+		bookC.setTitle("titleC");
+		bookC.setAuthor("authorC");
+		bookC.setIsbn("isbnC");
+		bookC.setPublisher("publisherC");
+
+		List<Book> result = this.bookService.create(List.of(bookA, bookB, bookC));
+		assertThat(result).hasSize(3);
+		// verify proper ids are generated
+		assertThat(result).element(0).satisfies(book -> {
+			assertThat(book.getTitle()).isEqualTo("titleA");
+			assertThat(book.getId()).isEqualTo(1100000L);
+		});
+		assertThat(result).element(1).satisfies(book -> {
+			assertThat(book.getTitle()).isEqualTo("titleB");
+			assertThat(book.getId()).isEqualTo(1100001L);
+		});
+		assertThat(result).element(2).satisfies(book -> {
+			assertThat(book.getTitle()).isEqualTo("titleC");
+			assertThat(book.getId()).isEqualTo(1200000L);
+		});
 	}
 
 }

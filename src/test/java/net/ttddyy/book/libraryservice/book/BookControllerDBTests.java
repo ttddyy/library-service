@@ -37,6 +37,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -195,6 +196,33 @@ class BookControllerDBTests {
 		assertThat(page).isNotNull();
 		assertThat(page.getTotalElements()).isEqualTo(1);
 		assertThat(page.getContent()).first().extracting(BookDto::id).isEqualTo(2L);
+	}
+
+	@Test
+	void listRegisteredBooks() {
+		String sql = """
+					INSERT INTO books (id, school_id, title, author, isbn, publisher, book_category_id, date_added)
+					VALUES  (1, 'sky', 'foo', 'foo', 'foo', 'foo', 3, '2010-01-10'),
+							(2, 'sky', 'bar', 'bar', 'bar', 'bar', 3, '2020-02-20'),
+							(3, 'ocean', 'baz', 'baz', 'baz', 'baz', 10, '2010-01-11')
+					;
+				""";
+		this.jdbcTemplate.update(sql);
+
+		Page<BookDto> page;
+
+		LocalDate from = LocalDate.parse("2010-01-10");
+		LocalDate to = LocalDate.parse("2010-02-01");
+
+		page = this.controller.listRegisteredBooks("sky", from, to, Pageable.unpaged());
+		assertThat(page).isNotNull();
+		assertThat(page.getTotalElements()).isEqualTo(1);
+		assertThat(page.getContent()).extracting(BookDto::id).containsExactlyInAnyOrder(1L);
+
+		page = this.controller.listRegisteredBooks(null, from, to, Pageable.unpaged());
+		assertThat(page).isNotNull();
+		assertThat(page.getTotalElements()).isEqualTo(2);
+		assertThat(page.getContent()).extracting(BookDto::id).containsExactlyInAnyOrder(1L, 3L);
 	}
 
 	@Test

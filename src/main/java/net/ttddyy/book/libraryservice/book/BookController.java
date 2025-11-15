@@ -17,13 +17,23 @@
 package net.ttddyy.book.libraryservice.book;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.Nullable;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 
 /**
@@ -42,6 +52,21 @@ class BookController {
 	Page<BookDto> list(@RequestParam(required = false) @Nullable String schoolId,
 			@RequestParam(required = false) @Nullable BookStatus status, @ParameterObject Pageable pageable) {
 		Page<Book> page = this.bookService.list(schoolId, status, pageable);
+		List<BookDto> books = BookMapper.INSTANCE.toDtoList(page.getContent());
+		return new PageImpl<>(books, page.getPageable(), page.getTotalElements());
+	}
+
+	@GetMapping("/api/books/registered")
+	Page<BookDto> listRegisteredBooks(@RequestParam(required = false) @Nullable String schoolId,
+			@Parameter(description = "UTC date") @RequestParam LocalDate from,
+			@Parameter(description = "UTC date") @RequestParam(required = false) @Nullable LocalDate to,
+			@ParameterObject Pageable pageable) {
+		if (to == null) {
+			to = LocalDate.now();
+		}
+		Instant fromInstant = from.atStartOfDay(ZoneOffset.UTC).toInstant();
+		Instant toInstant = to.atStartOfDay(ZoneOffset.UTC).toInstant();
+		Page<Book> page = this.bookService.listByAddedTime(schoolId, fromInstant, toInstant, pageable);
 		List<BookDto> books = BookMapper.INSTANCE.toDtoList(page.getContent());
 		return new PageImpl<>(books, page.getPageable(), page.getTotalElements());
 	}

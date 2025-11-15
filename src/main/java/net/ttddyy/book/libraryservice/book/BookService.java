@@ -70,6 +70,13 @@ public class BookService {
 		return this.bookRepository.findAll(example, pageable);
 	}
 
+	public Page<Book> listByAddedTime(@Nullable String schoolId, Instant from, Instant after, Pageable pageable) {
+		if (schoolId == null) {
+			return this.bookRepository.findAllByAddedTimeBetween(from, after, pageable);
+		}
+		return this.bookRepository.findAllBySchoolIdAndAddedTimeBetween(schoolId, from, after, pageable);
+	}
+
 	public Page<Book> search(@Nullable String schoolId, @Nullable String isbn, @Nullable String title,
 			@Nullable String titleKana, @Nullable String author, @Nullable String authorKana,
 			@Nullable String publisher, @Nullable Long categoryId, Pageable pageable) {

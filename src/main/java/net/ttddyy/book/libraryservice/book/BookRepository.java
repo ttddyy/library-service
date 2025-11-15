@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,14 @@
 
 package net.ttddyy.book.libraryservice.book;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.ListQueryByExampleExecutor;
 import org.springframework.stereotype.Repository;
+
+import java.time.Instant;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -29,5 +33,10 @@ public interface BookRepository extends JpaRepository<Book, Long>, ListQueryByEx
 
 	@Query("SELECT CASE WHEN (max(id) IS NULL ) THEN :start ELSE max(id) + 1 END FROM Book WHERE id BETWEEN :start AND :end")
 	long nextId(long start, long end);
+
+	Page<Book> findAllByAddedTimeBetween(Instant addedTimeAfter, Instant addedTimeBefore, Pageable pageable);
+
+	Page<Book> findAllBySchoolIdAndAddedTimeBetween(String schoolId, Instant addedTimeAfter, Instant addedTimeBefore,
+			Pageable pageable);
 
 }

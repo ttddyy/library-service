@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,11 +72,11 @@ class CheckoutRepositoryTests {
 
 		// books
 		sql = """
-					INSERT INTO books (id, school_id, title, author, isbn, publisher, book_category_id, is_missing, date_lost, num_checkouts)
-					VALUES  (1, 'sky', 'foo', 'foo', 'foo', 'foo', 3, false, null, 10),
-							(2, 'sky', 'bar', 'bar', 'bar', 'bar', 3, true,'2020-02-22', 20),
-							(3, 'ocean', 'baz', 'baz', 'baz', 'baz', 10, true,'2020-02-22', 30),
-							(4, 'ocean', 'qux', 'baz', 'baz', 'baz', 10, true,'2020-02-22', 30);
+					INSERT INTO books (id, school_id, title, author, isbn, publisher, book_category_id, status, status_changed_at, num_checkouts)
+					VALUES  (1, 'sky', 'foo', 'foo', 'foo', 'foo', 3, 'AVAILABLE', '2020-02-22', 10),
+							(2, 'sky', 'bar', 'bar', 'bar', 'bar', 3, 'LOST','2020-02-22', 20),
+							(3, 'ocean', 'baz', 'baz', 'baz', 'baz', 10, 'LOST','2020-02-22', 30),
+							(4, 'ocean', 'qux', 'baz', 'baz', 'baz', 10, 'LOST','2020-02-22', 30);
 				""";
 		this.jdbcTemplate.update(sql);
 
@@ -112,11 +112,11 @@ class CheckoutRepositoryTests {
 
 		// books
 		sql = """
-					INSERT INTO books (id, school_id, title, author, isbn, publisher, book_category_id, is_missing, date_lost, num_checkouts)
-					VALUES  (1, 'sky', 'foo', 'foo', 'foo', 'foo', 3, false, null, 10),
-							(2, 'sky', 'bar', 'bar', 'bar', 'bar', 3, true,'2020-02-22', 20),
-							(3, 'ocean', 'baz', 'baz', 'baz', 'baz', 10, true,'2020-02-22', 30),
-							(4, 'ocean', 'qux', 'baz', 'baz', 'baz', 10, true,'2020-02-22', 30);
+					INSERT INTO books (id, school_id, title, author, isbn, publisher, book_category_id, status, status_changed_at, num_checkouts)
+					VALUES  (1, 'sky', 'foo', 'foo', 'foo', 'foo', 3, 'AVAILABLE', '2020-02-22', 10),
+							(2, 'sky', 'bar', 'bar', 'bar', 'bar', 3, 'LOST','2020-02-22', 20),
+							(3, 'ocean', 'baz', 'baz', 'baz', 'baz', 10, 'LOST','2020-02-22', 30),
+							(4, 'ocean', 'qux', 'baz', 'baz', 'baz', 10, 'LOST','2020-02-22', 30);
 				""";
 		this.jdbcTemplate.update(sql);
 
@@ -148,11 +148,11 @@ class CheckoutRepositoryTests {
 
 		// books
 		sql = """
-					INSERT INTO books (id, school_id, title, author, isbn, publisher, book_category_id, is_missing, date_lost, num_checkouts)
-					VALUES  (1, 'sky', 'foo', 'foo', 'foo', 'foo', 3, false, null, 10),
-							(2, 'sky', 'bar', 'bar', 'bar', 'bar', 3, true,'2020-02-22', 20),
-							(3, 'ocean', 'baz', 'baz', 'baz', 'baz', 10, true,'2020-02-22', 30),
-							(4, 'ocean', 'qux', 'baz', 'baz', 'baz', 10, true,'2020-02-22', 30);
+					INSERT INTO books (id, school_id, title, author, isbn, publisher, book_category_id, status, status_changed_at, num_checkouts)
+					VALUES  (1, 'sky', 'foo', 'foo', 'foo', 'foo', 3, 'AVAILABLE', '2020-02-22', 10),
+							(2, 'sky', 'bar', 'bar', 'bar', 'bar', 3, 'LOST','2020-02-22', 20),
+							(3, 'ocean', 'baz', 'baz', 'baz', 'baz', 10, 'LOST','2020-02-22', 30),
+							(4, 'ocean', 'qux', 'baz', 'baz', 'baz', 10, 'LOST','2020-02-22', 30);
 				""";
 		this.jdbcTemplate.update(sql);
 

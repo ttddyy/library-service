@@ -16,19 +16,15 @@
 
 package net.ttddyy.book.libraryservice.book;
 
-import java.time.Clock;
-import java.time.LocalDate;
-import java.util.List;
-
-import org.mapstruct.AfterMapping;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.factory.Mappers;
-
 import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 /**
  * Mappings between entity and dto for books.
@@ -49,24 +45,8 @@ public interface BookMapper {
 
 	List<Book> toBookList(List<BookDtoCreate> books);
 
-	// "deletedDate" is populated by @AfterMapping
 	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-	@Mapping(ignore = true, target = "deletedDate")
-	void updateBookFromDto(@MappingTarget Book book, BookDtoUpdate dto, Clock clock);
-
-	@AfterMapping
-	default Book handleDeletedAndLost(@MappingTarget Book book, BookDtoUpdate dto, Clock clock) {
-		// handle delete
-		if (dto.delete() != null) {
-			book.setDeletedDate(dto.delete() ? LocalDate.now(clock) : null);
-		}
-		// handle missing
-		if (dto.missing() != null) {
-			book.setMissing(dto.missing());
-			book.setLostDate(dto.missing() ? LocalDate.now(clock) : null);
-		}
-		return book;
-	}
+	void updateBookFromDto(@MappingTarget Book book, BookDtoUpdate dto);
 
 	default Page<BookDto> toDtoPage(Page<Book> page) {
 		return page.map(this::toDto);

@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.Clock;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,18 +46,26 @@ public class BookService {
 
 	private final BookCategoryRepository categoryRepository;
 
+	private final BookStatusHistoryRepository statusHistoryRepository;
+
 	private final Clock clock;
 
-	public BookService(BookRepository bookRepository, BookCategoryRepository categoryRepository, Clock clock) {
+	public BookService(BookRepository bookRepository, BookCategoryRepository categoryRepository,
+			BookStatusHistoryRepository statusHistoryRepository, Clock clock) {
 		this.bookRepository = bookRepository;
 		this.categoryRepository = categoryRepository;
+		this.statusHistoryRepository = statusHistoryRepository;
 		this.clock = clock;
 	}
 
-	public Page<Book> list(@Nullable String schoolId, @Nullable Boolean isMissing, Pageable pageable) {
+	public Page<Book> list(@Nullable String schoolId, @Nullable BookStatus status, Pageable pageable) {
 		Book book = new Book();
-		book.setSchoolId(schoolId);
-		book.setMissing(isMissing);
+		if (schoolId != null) {
+			book.setSchoolId(schoolId);
+		}
+		if (status != null) {
+			book.setStatus(status);
+		}
 		Example<Book> example = Example.of(book);
 		return this.bookRepository.findAll(example, pageable);
 	}
@@ -115,7 +124,8 @@ public class BookService {
 		Long nextId = this.bookRepository.nextId(category.getStartingId(), category.getEndingId());
 		book.setId(nextId);
 		book.setCategory(category);
-		book.setMissing(false);
+		book.setStatus(BookStatus.AVAILABLE);
+		book.setStatusChangedAt(clock.instant());
 		return this.bookRepository.save(book);
 	}
 
@@ -131,7 +141,24 @@ public class BookService {
 	@Transactional
 	public Book update(long id, BookDtoUpdate dto) {
 		Book book = this.bookRepository.getReferenceById(id);
-		BookMapper.INSTANCE.updateBookFromDto(book, dto, this.clock);
+		BookMapper.INSTANCE.updateBookFromDto(book, dto);
+		return this.bookRepository.save(book);
+	}
+
+	@Transactional
+	public Book updateStatus(long id, BookStatus status) {
+		Book book = this.bookRepository.getReferenceById(id);
+		if (book.getStatus() == status) {
+			return book;
+		}
+		Instant now = this.clock.instant();
+		BookStatusHistory history = new BookStatusHistory();
+		history.setBookId(book.getId());
+		history.setOldStatus(book.getStatus());
+		history.setNewStatus(status);
+		book.setStatus(status);
+		book.setStatusChangedAt(now);
+		this.statusHistoryRepository.save(history);
 		return this.bookRepository.save(book);
 	}
 

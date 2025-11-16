@@ -40,8 +40,8 @@ class BookController {
 
 	@GetMapping("/api/books")
 	Page<BookDto> list(@RequestParam(required = false) @Nullable String schoolId,
-			@RequestParam(required = false) @Nullable Boolean missing, @ParameterObject Pageable pageable) {
-		Page<Book> page = this.bookService.list(schoolId, missing, pageable);
+			@RequestParam(required = false) @Nullable BookStatus status, @ParameterObject Pageable pageable) {
+		Page<Book> page = this.bookService.list(schoolId, status, pageable);
 		List<BookDto> books = BookMapper.INSTANCE.toDtoList(page.getContent());
 		return new PageImpl<>(books, page.getPageable(), page.getTotalElements());
 	}
@@ -67,6 +67,13 @@ class BookController {
 	BookDto update(@PathVariable long id, BookDtoUpdate dto) {
 		// TODO: validation
 		Book book = this.bookService.update(id, dto);
+		return BookMapper.INSTANCE.toDto(book);
+	}
+
+	@Operation(summary = "Update book status")
+	@PutMapping("/api/books/{id}/status")
+	BookDto updateStatus(@PathVariable long id, @RequestBody BookStatusDtoUpdate request) {
+		Book book = this.bookService.updateStatus(id, request.status());
 		return BookMapper.INSTANCE.toDto(book);
 	}
 

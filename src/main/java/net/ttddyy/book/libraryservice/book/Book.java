@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,10 @@
 
 package net.ttddyy.book.libraryservice.book;
 
-import java.time.Instant;
-import java.time.LocalDate;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -29,7 +28,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import net.ttddyy.book.libraryservice.book.category.BookCategory;
 
-import org.springframework.lang.Nullable;
+import java.time.Instant;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -72,17 +71,10 @@ public class Book {
 	@Column(name = "date_added")
 	private Instant addedTime;
 
-	@Column(name = "date_deleted")
-	@Nullable
-	private LocalDate deletedDate;
+	@Enumerated(EnumType.STRING)
+	private BookStatus status;
 
-	@Column(name = "date_lost")
-	@Nullable
-	private LocalDate lostDate;
-
-	@Column(name = "is_missing")
-	@Nullable
-	private Boolean missing;
+	private Instant statusChangedAt;
 
 	// readonly for now
 	@Column(name = "num_checkouts", insertable = false, updatable = false)
@@ -190,31 +182,20 @@ public class Book {
 		this.addedTime = addedTime;
 	}
 
-	@Nullable
-	public LocalDate getDeletedDate() {
-		return this.deletedDate;
+	public BookStatus getStatus() {
+		return status;
 	}
 
-	public void setDeletedDate(@Nullable LocalDate deletedDate) {
-		this.deletedDate = deletedDate;
+	public void setStatus(BookStatus status) {
+		this.status = status;
 	}
 
-	@Nullable
-	public LocalDate getLostDate() {
-		return this.lostDate;
+	public Instant getStatusChangedAt() {
+		return statusChangedAt;
 	}
 
-	public void setLostDate(@Nullable LocalDate lostDate) {
-		this.lostDate = lostDate;
-	}
-
-	@Nullable
-	public Boolean getMissing() {
-		return this.missing;
-	}
-
-	public void setMissing(Boolean missing) {
-		this.missing = missing;
+	public void setStatusChangedAt(Instant statusChangedAt) {
+		this.statusChangedAt = statusChangedAt;
 	}
 
 	public Integer getCheckouts() {

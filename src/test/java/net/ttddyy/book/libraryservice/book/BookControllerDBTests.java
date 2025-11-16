@@ -23,6 +23,8 @@ import org.hibernate.stat.EntityStatistics;
 import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
@@ -33,8 +35,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 
@@ -74,6 +77,10 @@ class BookControllerDBTests {
 
 	@Test
 	void create() {
+		// for book.statusChangedAt
+		Instant instant = Instant.parse("2022-12-01T00:00:00.00Z");
+		this.clock.willReturn(instant);
+
 		// category: (3, 'C', 'SJ民話', 1200000, 1299999, '民話', 'ocean', '')
 		BookDtoCreate request = new BookDtoCreate("foo", "", "foo", "", "foo", "", "foo", "river", 3);
 		List<BookDto> result = this.controller.create(List.of(request));
@@ -106,8 +113,8 @@ class BookControllerDBTests {
 	@Test
 	void update() {
 		createTestData();
-		BookDtoUpdate updateRequest = new BookDtoUpdate("title-updated", null, "author-updated", null, null, null, null,
-				null, null);
+		BookDtoUpdate updateRequest = new BookDtoUpdate("title-updated", null, "author-updated", null, null, null,
+				null);
 
 		BookDto result = this.controller.update(1200000, updateRequest);
 		this.entityManager.flush();
@@ -130,62 +137,28 @@ class BookControllerDBTests {
 		assertThat(entityStatistics.getUpdateCount()).isEqualTo(1);
 	}
 
-	@Test
-	void deleteByUpdate() {
+	@ParameterizedTest
+	@EnumSource(names = { "LOST", "DISCARDED" })
+	void updateStatus(BookStatus status) {
 		createTestData();
-
-		// delete=true
-		BookDtoUpdate updateRequest = new BookDtoUpdate("title-updated", null, null, null, null, null, null, true,
-				null);
 
 		// for LocalDate.now(clock)
 		Instant instant = Instant.parse("2022-12-01T00:00:00.00Z");
 		this.clock.willReturn(instant);
 
-		BookDto result = this.controller.update(1200000, updateRequest);
+		BookStatusDtoUpdate request = new BookStatusDtoUpdate(status);
+		BookDto result = this.controller.updateStatus(1200000, request);
 		this.entityManager.flush();
 
 		assertThat(result).isNotNull();
-		assertThat(result.title()).isEqualTo("title-updated");
-		assertThat(result.deletedDate()).isEqualTo("2022-12-01");
 
 		// verify actually data in DB
 		Map<String, Object> map = this.jdbcTemplate.queryForMap("SELECT * FROM books");
-		assertThat(map.get("date_deleted")).isInstanceOfSatisfying(Date.class, (date) -> {
-			assertThat(date).isEqualTo("2022-12-01");
+		assertThat(map.get("status")).isEqualTo(status.toString());
+		assertThat(map.get("status_changed_at")).isInstanceOfSatisfying(Timestamp.class, (timestamp) -> {
+			// Timestamp read with local timezone, so convert to UTC
+			assertThat(timestamp.toLocalDateTime().toInstant(ZoneOffset.UTC)).isEqualTo(instant);
 		});
-
-		// it is a soft delete
-		Statistics statistics = this.sessionFactory.getStatistics();
-		EntityStatistics entityStatistics = statistics.getEntityStatistics(Book.class.getName());
-		assertThat(entityStatistics.getUpdateCount()).isEqualTo(1);
-		assertThat(entityStatistics.getDeleteCount()).isEqualTo(0);
-	}
-
-	@Test
-	void missingByUpdate() {
-		createTestData();
-
-		// missing = true
-		BookDtoUpdate updateRequest = new BookDtoUpdate("title-updated", null, null, null, null, null, null, null,
-				true);
-
-		// for LocalDate.now(clock)
-		Instant instant = Instant.parse("2022-12-01T00:00:00.00Z");
-		this.clock.willReturn(instant);
-
-		BookDto result = this.controller.update(1200000, updateRequest);
-		this.entityManager.flush();
-
-		assertThat(result).isNotNull();
-		assertThat(result.lostDate()).isEqualTo("2022-12-01");
-
-		// verify actually data in DB
-		Map<String, Object> map = this.jdbcTemplate.queryForMap("SELECT * FROM books");
-		assertThat(map.get("date_lost")).isInstanceOfSatisfying(Date.class, (date) -> {
-			assertThat(date).isEqualTo("2022-12-01");
-		});
-		assertThat(map).containsEntry("is_missing", true);
 
 		// it is a soft delete
 		Statistics statistics = this.sessionFactory.getStatistics();
@@ -196,8 +169,8 @@ class BookControllerDBTests {
 
 	private void createTestData() {
 		String sql = """
-					INSERT INTO books (id, school_id, title, author, isbn, publisher, book_category_id, is_missing, date_lost)
-					VALUES  (1200000, 'river', 'foo', 'foo', 'foo', 'foo', 3, false, null);
+					INSERT INTO books (id, school_id, title, author, isbn, publisher, book_category_id)
+					VALUES  (1200000, 'river', 'foo', 'foo', 'foo', 'foo', 3);
 				""";
 		this.jdbcTemplate.update(sql);
 	}
@@ -205,10 +178,10 @@ class BookControllerDBTests {
 	@Test
 	void list() {
 		String sql = """
-					INSERT INTO books (id, school_id, title, author, isbn, publisher, book_category_id, is_missing, date_lost, num_checkouts)
-					VALUES  (1, 'sky', 'foo', 'foo', 'foo', 'foo', 3, false, null, 10),
-							(2, 'sky', 'bar', 'bar', 'bar', 'bar', 3, true,'2020-02-22', 20),
-							(3, 'ocean', 'baz', 'baz', 'baz', 'baz', 10, true,'2020-02-22', 30)
+					INSERT INTO books (id, school_id, title, author, isbn, publisher, book_category_id, num_checkouts, status, status_changed_at)
+					VALUES  (1, 'sky', 'foo', 'foo', 'foo', 'foo', 3, 10, 'AVAILABLE', '2020-02-22'),
+							(2, 'sky', 'bar', 'bar', 'bar', 'bar', 3, 20, 'LOST', '2020-02-22'),
+							(3, 'ocean', 'baz', 'baz', 'baz', 'baz', 10, 30, 'LOST', '2020-02-22')
 					;
 				""";
 		this.jdbcTemplate.update(sql);
@@ -220,7 +193,7 @@ class BookControllerDBTests {
 		assertThat(page.getTotalElements()).isEqualTo(2);
 		assertThat(page.getContent()).extracting(BookDto::id).containsExactlyInAnyOrder(1L, 2L);
 
-		page = this.controller.list("sky", true, Pageable.unpaged());
+		page = this.controller.list("sky", BookStatus.LOST, Pageable.unpaged());
 		assertThat(page).isNotNull();
 		assertThat(page.getTotalElements()).isEqualTo(1);
 		assertThat(page.getContent()).first().extracting(BookDto::id).isEqualTo(2L);
@@ -229,9 +202,9 @@ class BookControllerDBTests {
 	@Test
 	void get() {
 		String sql = """
-					INSERT INTO books (id, school_id, title, author, isbn, publisher, book_category_id, is_missing, date_lost)
-					VALUES  (1, 'sky', 'foo', 'foo', 'foo', 'foo', 3, false,null),
-							(2, 'sky', 'bar', 'bar', 'bar', 'bar', 3, true,'2020-02-22')
+					INSERT INTO books (id, school_id, title, author, isbn, publisher, book_category_id)
+					VALUES  (1, 'sky', 'foo', 'foo', 'foo', 'foo', 3),
+							(2, 'sky', 'bar', 'bar', 'bar', 'bar', 3)
 					;
 				""";
 		this.jdbcTemplate.update(sql);
@@ -240,7 +213,6 @@ class BookControllerDBTests {
 		result = this.controller.get(2L);
 		assertThat(result).isNotNull();
 		assertThat(result.title()).isEqualTo("bar");
-		assertThat(result.lostDate()).isEqualTo("2020-02-22");
 	}
 
 }

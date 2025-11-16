@@ -16,30 +16,15 @@
 
 package net.ttddyy.book.libraryservice.book;
 
-import net.ttddyy.book.libraryservice.book.category.BookCategoryDto;
-
-import java.time.Instant;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.query.ListQueryByExampleExecutor;
+import org.springframework.stereotype.Repository;
 
 /**
- * General DTO for {@link Book}.
- *
  * @author Tadaya Tsuyukubo
  */
-public record BookDto(
-// @formatter:off
-		Long id,
-		String title,
-		String titleKana,
-		String author,
-		String authorKana,
-		String isbn,
-		String comments,
-		String publisher,
-		String schoolId,
-		BookCategoryDto category,
-		BookStatus status,
-		Instant statusChangedAt
-// @formatter:on
-) {
+@Repository
+public interface BookStatusHistoryRepository
+		extends JpaRepository<BookStatusHistory, Long>, ListQueryByExampleExecutor<BookStatusHistory> {
 
 }

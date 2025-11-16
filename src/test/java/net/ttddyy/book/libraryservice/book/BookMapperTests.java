@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,9 @@
 
 package net.ttddyy.book.libraryservice.book;
 
-import java.time.Clock;
-
-import net.ttddyy.book.libraryservice.MockClocks.MockClock;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyNoInteractions;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -35,10 +30,9 @@ class BookMapperTests {
 		Book book = new Book();
 
 		BookDtoUpdate dto = new BookDtoUpdate("bar-title", "bar-title-kana", "bar-author", "bar-author-kana",
-				"bar-isbn", "bar-comments", "bar-publisher", null, null);
-		Clock clock = mock(Clock.class);
+				"bar-isbn", "bar-comments", "bar-publisher");
 
-		BookMapper.INSTANCE.updateBookFromDto(book, dto, clock);
+		BookMapper.INSTANCE.updateBookFromDto(book, dto);
 		assertThat(book.getTitle()).isEqualTo("bar-title");
 		assertThat(book.getTitleKana()).isEqualTo("bar-title-kana");
 		assertThat(book.getAuthor()).isEqualTo("bar-author");
@@ -46,8 +40,6 @@ class BookMapperTests {
 		assertThat(book.getIsbn()).isEqualTo("bar-isbn");
 		assertThat(book.getComments()).isEqualTo("bar-comments");
 		assertThat(book.getPublisher()).isEqualTo("bar-publisher");
-
-		verifyNoInteractions(clock);
 	}
 
 	@Test
@@ -61,10 +53,9 @@ class BookMapperTests {
 		book.setComments("foo-comments");
 		book.setPublisher("foo-publisher");
 
-		BookDtoUpdate dto = new BookDtoUpdate(null, null, null, null, null, null, null, null, null);
-		Clock clock = mock(Clock.class);
+		BookDtoUpdate dto = new BookDtoUpdate(null, null, null, null, null, null, null);
 
-		BookMapper.INSTANCE.updateBookFromDto(book, dto, clock);
+		BookMapper.INSTANCE.updateBookFromDto(book, dto);
 		assertThat(book.getTitle()).isEqualTo("foo-title");
 		assertThat(book.getTitleKana()).isEqualTo("foo-title-kana");
 		assertThat(book.getAuthor()).isEqualTo("foo-author");
@@ -73,50 +64,18 @@ class BookMapperTests {
 		assertThat(book.getComments()).isEqualTo("foo-comments");
 		assertThat(book.getPublisher()).isEqualTo("foo-publisher");
 
-		verifyNoInteractions(clock);
 	}
 
 	@Test
-	void updateBookFromDtoWithDelete() {
+	void updateBookFromDtoWithStatus() {
 		Book book = new Book();
+		book.setStatus(BookStatus.LOST);
+		// delete=true
+		BookDtoUpdate dto = new BookDtoUpdate("bar-title", null, null, null, null, null, null);
 
-		BookDtoUpdate dto = new BookDtoUpdate("bar-title", null, null, null, null, null, null, true, null);
+		BookMapper.INSTANCE.updateBookFromDto(book, dto);
 
-		MockClock clock = new MockClock("2022-12-01T00:00:00.00Z");
-
-		BookMapper.INSTANCE.updateBookFromDto(book, dto, clock);
-		assertThat(book.getTitle()).isEqualTo("bar-title");
-		assertThat(book.getDeletedDate()).isEqualTo("2022-12-01");
-
-		assertThat(clock.getCallCount()).isEqualTo(1);
-
-		// now cancel the deletion (delete=false)
-		dto = new BookDtoUpdate("bar-title", null, null, null, null, null, null, false, null);
-		BookMapper.INSTANCE.updateBookFromDto(book, dto, clock);
-		assertThat(book.getDeletedDate()).isNull();
-	}
-
-	@Test
-	void updateBookFromDtoWithMissing() {
-		Book book = new Book();
-		assertThat(book.getMissing()).isNull();
-		assertThat(book.getLostDate()).isNull();
-
-		// missing=true
-		BookDtoUpdate dto = new BookDtoUpdate(null, null, null, null, null, null, null, null, true);
-		MockClock clock = new MockClock("2022-12-01T00:00:00.00Z");
-
-		BookMapper.INSTANCE.updateBookFromDto(book, dto, clock);
-		assertThat(book.getMissing()).isTrue();
-		assertThat(book.getLostDate()).isEqualTo("2022-12-01");
-
-		assertThat(clock.getCallCount()).isEqualTo(1);
-
-		// now cancel missing (missing=false)
-		dto = new BookDtoUpdate(null, null, null, null, null, null, null, null, false);
-		BookMapper.INSTANCE.updateBookFromDto(book, dto, clock);
-		assertThat(book.getMissing()).isFalse();
-		assertThat(book.getLostDate()).isNull();
+		assertThat(book.getStatus()).as("status should not be updated").isEqualTo(BookStatus.LOST);
 	}
 
 }

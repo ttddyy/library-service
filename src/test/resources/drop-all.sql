@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS limits;
 DROP TABLE IF EXISTS checkouts_history;
 DROP TABLE IF EXISTS checkouts;
 DROP TABLE IF EXISTS members;
+DROP TABLE IF EXISTS book_status_history;
 DROP TABLE IF EXISTS books;
 DROP TABLE IF EXISTS book_categories;
 DROP TABLE IF EXISTS schools;

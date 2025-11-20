@@ -37,7 +37,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 
@@ -156,8 +155,7 @@ class BookControllerDBTests {
 		Map<String, Object> map = this.jdbcTemplate.queryForMap("SELECT * FROM books");
 		assertThat(map.get("status")).isEqualTo(status.toString());
 		assertThat(map.get("status_changed_at")).isInstanceOfSatisfying(Timestamp.class, (timestamp) -> {
-			// Timestamp read with local timezone, so convert to UTC
-			assertThat(timestamp.toLocalDateTime().toInstant(ZoneOffset.UTC)).isEqualTo(instant);
+			assertThat(timestamp.toInstant()).isEqualTo(instant);
 		});
 
 		// it is a soft delete

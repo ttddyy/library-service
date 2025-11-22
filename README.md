@@ -152,6 +152,12 @@ Connect to database via psql
 docker exec -it postgres-db psql -U root -W library_service -p 5432
 ```
 
+## Date and Time Handling
+All dates and timestamps in the system are handled in UTC to ensure consistency across services.
+The system uses Java’s `Instant` type and PostgreSQL’s `timestamptz` column for storing these values.
+All API inputs and outputs are expected to use UTC, and clients should send any date or time parameters accordingly.
+
+
 ## Trouble Shooting
 
 Tests failed with the following exception:

@@ -25,6 +25,10 @@ public record CheckoutDto(
 // @formatter:off
 		long bookId,
 		long memberId,
+		String memberFirstName,
+		String memberLastName,
+		int memberGrade,
+		int memberClassNumber,
 		LocalDate checkoutDate,
 		LocalDate dueDate,
         Book book

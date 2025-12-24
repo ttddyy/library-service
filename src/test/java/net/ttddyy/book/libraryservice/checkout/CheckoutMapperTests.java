@@ -50,6 +50,10 @@ class CheckoutMapperTests {
 
 		Member member = new Member();
 		member.setId(memberId);
+		member.setFirstname("foo-firstname");
+		member.setLastname("foo-lastname");
+		member.setGrade(7);
+		member.setClassNumber(2);
 
 		CheckoutId id = new CheckoutId(bookId, memberId);
 		Checkout checkout = new Checkout();
@@ -64,6 +68,10 @@ class CheckoutMapperTests {
 		CheckoutDto dto = result.get(0);
 		assertThat(dto.bookId()).isEqualTo(bookId);
 		assertThat(dto.memberId()).isEqualTo(memberId);
+		assertThat(dto.memberFirstName()).isEqualTo("foo-firstname");
+		assertThat(dto.memberLastName()).isEqualTo("foo-lastname");
+		assertThat(dto.memberGrade()).isEqualTo(7);
+		assertThat(dto.memberClassNumber()).isEqualTo(2);
 		assertThat(dto.checkoutDate()).isEqualTo("2020-02-02");
 		assertThat(dto.dueDate()).isEqualTo("2020-03-03");
 		assertThat(dto.book()).satisfies(bookDto -> {

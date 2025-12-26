@@ -38,7 +38,9 @@ public record BookDto(
 		String schoolId,
 		BookCategoryDto category,
 		BookStatus status,
-		Instant statusChangedAt
+		Instant statusChangedAt,
+		Integer checkouts,
+		Instant addedTime
 // @formatter:on
 ) {
 

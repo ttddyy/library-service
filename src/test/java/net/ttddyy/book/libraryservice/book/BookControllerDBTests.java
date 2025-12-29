@@ -211,7 +211,7 @@ class BookControllerDBTests {
 
 		Page<BookDto> page;
 
-		LocalDate from = LocalDate.parse("2010-01-10");
+		LocalDate from = LocalDate.parse("2010-01-01");
 		LocalDate to = LocalDate.parse("2010-02-01");
 
 		page = this.controller.listRegisteredBooks("sky", from, to, Pageable.unpaged());

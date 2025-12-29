@@ -125,6 +125,7 @@ public class BookService {
 
 	@Transactional(readOnly = false)
 	public Book create(Book book) {
+		Instant now = clock.instant();
 		// resolve next id based on the id range specified in the category
 		long categoryId = book.getCategory().getId();
 		BookCategory category = this.categoryRepository.getReferenceById(categoryId);
@@ -132,7 +133,8 @@ public class BookService {
 		book.setId(nextId);
 		book.setCategory(category);
 		book.setStatus(BookStatus.AVAILABLE);
-		book.setStatusChangedAt(clock.instant());
+		book.setStatusChangedAt(now);
+		book.setAddedTime(now);
 		return this.bookRepository.save(book);
 	}
 

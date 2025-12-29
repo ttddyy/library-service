@@ -133,6 +133,7 @@ class BookServiceTests {
 			assertThat(arg.getCategory()).isSameAs(category);
 			assertThat(arg.getStatus()).isEqualTo(BookStatus.AVAILABLE);
 			assertThat(arg.getStatusChangedAt()).isEqualTo(instant);
+			assertThat(arg.getAddedTime()).isEqualTo(instant);
 		}));
 	}
 

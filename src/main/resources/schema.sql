@@ -39,7 +39,7 @@ CREATE TABLE books
     isbn              VARCHAR(32)  NOT NULL,
     comments          VARCHAR(511),
     publisher         VARCHAR(256) NOT NULL,
-    date_added        TIMESTAMPTZ           DEFAULT CURRENT_TIMESTAMP,
+    date_added        TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     status            VARCHAR(20)  NOT NULL DEFAULT 'AVAILABLE',
     status_changed_at TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     num_checkouts     INT          NOT NULL DEFAULT 0,

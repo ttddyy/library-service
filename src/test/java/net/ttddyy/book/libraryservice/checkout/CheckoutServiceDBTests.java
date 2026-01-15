@@ -140,6 +140,49 @@ class CheckoutServiceDBTests {
 	}
 
 	@Test
+	void checkoutAsRenew() {
+		String sql;
+		// members
+		sql = """
+					INSERT INTO members (id, firstname_en, lastname_en, school_id, grade)
+					VALUES	(10, 'foo', 'foo', 'sky', 7);
+				""";
+		this.jdbcTemplate.update(sql);
+
+		// books
+		sql = """
+					INSERT INTO books (id, school_id, title, author, isbn, publisher, book_category_id, status, status_changed_at, num_checkouts)
+					VALUES  (1, 'sky', 'foo', 'foo', 'foo', 'foo', 3, 'AVAILABLE', '2020-02-22', 10),
+							(2, 'sky', 'bar', 'bar', 'bar', 'bar', 3, 'AVAILABLE','2020-02-22', 20),
+							(3, 'sky', 'baz', 'baz', 'baz', 'baz', 4, 'AVAILABLE','2020-02-22', 20);
+				""";
+		this.jdbcTemplate.update(sql);
+
+		// checkouts
+		sql = """
+				INSERT INTO checkouts (book_id, member_id, checkout_date, due_date)
+				VALUES	( 1, 10, '2020-02-03', '2020-02-10'),
+						( 2, 10, '2020-02-03', '2020-02-10'),
+						( 3, 10, '2020-02-03', '2020-02-10');
+				""";
+		this.jdbcTemplate.update(sql);
+
+		// checkouts
+		sql = """
+				UPDATE checkout_limit_defaults SET max_books = 3;
+				""";
+		this.jdbcTemplate.update(sql);
+
+		Set<Long> bookIds = Set.of(1L, 2L);
+		this.service.checkout("sky", 10, bookIds, false);
+
+		this.entityManager.flush();
+
+		int count = JdbcTestUtils.countRowsInTable(this.jdbcTemplate, "checkouts");
+		assertThat(count).isEqualTo(3);
+	}
+
+	@Test
 	void list() {
 		String sql;
 		// members

@@ -68,6 +68,9 @@ public class CheckoutService {
 		int maxDays = checkoutLimit.maxDays();
 		LocalDate dueDate = LocalDate.now().plusDays(maxDays);
 
+		// return them first
+		bulkReturn(bookIds);
+
 		if (!force) {
 			// perform validation. If it gets more complicated, move to a dedicated class.
 			long current = this.checkoutRepository.countByIdMemberId(memberId);
@@ -77,8 +80,6 @@ public class CheckoutService {
 				throw new RuntimeException(msg);
 			}
 		}
-		// return them first
-		bulkReturn(bookIds);
 
 		LocalDate today = LocalDate.now(this.clock);
 		List<Checkout> checkouts = new ArrayList<>();

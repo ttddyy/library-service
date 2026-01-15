@@ -89,7 +89,7 @@ class BookController {
 	}
 
 	@PutMapping("/api/books/{id}")
-	BookDto update(@PathVariable long id, BookDtoUpdate dto) {
+	BookDto update(@PathVariable long id, @RequestBody BookDtoUpdate dto) {
 		// TODO: validation
 		Book book = this.bookService.update(id, dto);
 		return BookMapper.INSTANCE.toDto(book);

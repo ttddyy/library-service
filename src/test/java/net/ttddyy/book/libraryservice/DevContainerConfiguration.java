@@ -16,22 +16,9 @@
 
 package net.ttddyy.book.libraryservice;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.sql.Connection;
-import java.sql.DriverManager;
-
-import javax.sql.DataSource;
-
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
-
 import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
 import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
-import org.springframework.boot.autoconfigure.jdbc.JdbcConnectionDetails;
+import org.springframework.boot.jdbc.autoconfigure.JdbcConnectionDetails;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ConditionContext;
@@ -43,9 +30,19 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.jdbc.datasource.init.CompositeDatabasePopulator;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
-import org.springframework.jdbc.datasource.init.DatabasePopulator;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
+import org.testcontainers.postgresql.PostgreSQLContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
+
+import javax.sql.DataSource;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.sql.Connection;
+import java.sql.DriverManager;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -78,10 +75,10 @@ class DevContainerConfiguration {
 	@ConditionalOnMissingLocalDatabase
 	@ServiceConnection
 	@SuppressWarnings("resource")
-	PostgreSQLContainer<?> postgreSQLContainer() {
+	PostgreSQLContainer postgreSQLContainer() {
 		// Due to the test-context cache, tests keeps connections.
 		// Need to increase the max connections for test.
-		return new PostgreSQLContainer<>("postgres:17").withReuse(true)
+		return new PostgreSQLContainer("postgres:17").withReuse(true)
 			.withCommand("postgres -c max_connections=100")
 			.waitingFor(Wait.forListeningPort());
 		// using a static name causes re-run to fail unless removing the container.

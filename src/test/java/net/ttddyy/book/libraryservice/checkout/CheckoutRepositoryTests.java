@@ -16,28 +16,26 @@
 
 package net.ttddyy.book.libraryservice.checkout;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import net.ttddyy.book.libraryservice.DbTest;
 import net.ttddyy.book.libraryservice.book.Book;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.jdbc.JdbcTestUtils;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,7 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 
 @DataJpaTest(properties = { "spring.jpa.properties.hibernate.generate_statistics=true" })
-@AutoConfigureTestDatabase(replace = Replace.NONE)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DbTest
 class CheckoutRepositoryTests {
 

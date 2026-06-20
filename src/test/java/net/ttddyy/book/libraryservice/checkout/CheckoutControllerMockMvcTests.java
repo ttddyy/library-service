@@ -16,25 +16,24 @@
 
 package net.ttddyy.book.libraryservice.checkout;
 
-import java.time.LocalDate;
-import java.util.List;
-
 import net.ttddyy.book.libraryservice.book.Book;
 import net.ttddyy.book.libraryservice.member.Member;
 import net.ttddyy.book.libraryservice.school.SchoolController;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.time.LocalDate;
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -44,6 +43,7 @@ import static org.mockito.BDDMockito.given;
  * @author Tadaya Tsuyukubo
  */
 @WebMvcTest(CheckoutController.class)
+@AutoConfigureWebTestClient
 class CheckoutControllerMockMvcTests {
 
 	@Autowired
@@ -52,7 +52,7 @@ class CheckoutControllerMockMvcTests {
 	@Autowired
 	WebTestClient webTestClient;
 
-	@MockBean
+	@MockitoBean
 	CheckoutService checkoutService;
 
 	@Test
@@ -93,11 +93,25 @@ class CheckoutControllerMockMvcTests {
 			.isOk()
 			.expectHeader()
 			.contentType(MediaType.APPLICATION_JSON)
-			.expectBodyList(CheckoutDto.class)
-			.consumeWith(result -> {
-				List<CheckoutDto> list = result.getResponseBody();
-				assertThat(list).hasSize(1);
-			});
+			.expectBody()
+			// @formatter:off
+			// Body =
+			// {"content":[
+			//   {"bookId":30,"memberId":20,"memberFirstName":null,"memberLastName":null,"memberGrade":0,"memberClassNumber":0,
+			//    "checkoutDate":"2020-02-02","dueDate":"2020-03-03",
+			//    "book":{"title":"foo-title","titleKana":"foo-title-kana","author":"foo-author","authorKana":"foo-author-kana",
+			//            "isbn":"foo-isbn","comments":"foo-comments","publisher":"foo-publisher"}}
+			//  ],
+			//  "page":{"size":1,"number":0,"totalElements":1,"totalPages":1}}
+			.jsonPath("$.page.size").isEqualTo(1)
+			.jsonPath("$.page.totalElements").isEqualTo(1)
+			.jsonPath("$.content[0].bookId").isEqualTo(bookId)
+			.jsonPath("$.content[0].memberId").isEqualTo(memberId)
+			.jsonPath("$.content[0].checkoutDate").isEqualTo("2020-02-02")
+			.jsonPath("$.content[0].dueDate").isEqualTo("2020-03-03")
+			.jsonPath("$.content[0].book.title").isEqualTo("foo-title")
+			// @formatter:on
+		;
 	}
 
 	@Test

@@ -18,14 +18,14 @@ package net.ttddyy.book.libraryservice.member;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.springframework.boot.resttestclient.TestRestTemplate;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
@@ -38,7 +38,7 @@ import org.springframework.test.context.DynamicPropertySource;
 class MemberApiTests {
 
 	@Container
-	static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17");
+	static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:17");
 
 	@DynamicPropertySource
 	static void registerPostgresProperties(DynamicPropertyRegistry registry) {

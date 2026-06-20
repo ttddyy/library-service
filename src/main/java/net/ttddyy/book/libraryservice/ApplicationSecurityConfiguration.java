@@ -16,8 +16,8 @@
 
 package net.ttddyy.book.libraryservice;
 
-import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
-import org.springframework.boot.actuate.health.HealthEndpoint;
+import org.springframework.boot.health.actuate.endpoint.HealthEndpoint;
+import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -43,7 +43,7 @@ class ApplicationSecurityConfiguration {
 			authz.requestMatchers("/api/schools").permitAll();
 			authz.anyRequest().authenticated();
 		});
-		http.csrf().disable(); // need for POST requests
+		http.csrf(csrf -> csrf.disable()); // need for POST requests
 		http.httpBasic(withDefaults());
 		return http.build();
 	}

@@ -16,10 +16,6 @@
 
 package net.ttddyy.book.libraryservice.checkout;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import net.ttddyy.book.libraryservice.DbTest;
 import net.ttddyy.book.libraryservice.MockClocks.System;
 import net.ttddyy.book.libraryservice.book.Book;
@@ -29,17 +25,20 @@ import net.ttddyy.book.libraryservice.checkout.limit.schedule.CheckoutLimitSched
 import net.ttddyy.book.libraryservice.member.Member;
 import org.hibernate.proxy.HibernateProxy;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase.Replace;
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.jdbc.JdbcTestUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

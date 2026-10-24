@@ -43,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Tadaya Tsuyukubo
  */
 @Service
+@Transactional(readOnly = true)
 public class RefreshTokenService {
 
 	private final SecureRandom random = new SecureRandom();
@@ -59,6 +60,7 @@ public class RefreshTokenService {
 		this.clock = clock;
 	}
 
+	@Transactional
 	public IssuedRefreshToken startFamily(String username) {
 		Instant now = this.clock.instant();
 		return insert(UUID.randomUUID(), username, now.plus(this.auth.getRefreshTokenTtl()));
@@ -97,12 +99,14 @@ public class RefreshTokenService {
 		return new RefreshResult(row.username(), insert(row.familyId(), row.username(), row.expiresAt()));
 	}
 
+	@Transactional
 	public void revokeFamily(String value) {
 		this.jdbcTemplate.update(
 				"DELETE FROM refresh_tokens WHERE family_id IN (SELECT family_id FROM refresh_tokens WHERE token_hash = ?)",
 				hash(value));
 	}
 
+	@Transactional
 	public void deleteExpired() {
 		this.jdbcTemplate.update("DELETE FROM refresh_tokens WHERE expires_at <= ?",
 				Timestamp.from(this.clock.instant()));

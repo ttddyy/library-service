@@ -34,6 +34,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -73,7 +74,7 @@ public class AuthController {
 	// CSRF
 	@PostMapping("/login")
 	ResponseEntity<LoginResponse> login(@RequestBody(required = false) @Nullable LoginRequest request) {
-		if (request == null || isBlank(request.username()) || isBlank(request.password())) {
+		if (request == null || !StringUtils.hasText(request.username()) || !StringUtils.hasText(request.password())) {
 			throw new BadCredentialsException("Missing credentials");
 		}
 		AuthService.LoginResult result = this.service.login(request.username(), request.password());
@@ -139,10 +140,6 @@ public class AuthController {
 			.path(COOKIE_PATH)
 			.maxAge(maxAge)
 			.build();
-	}
-
-	private static boolean isBlank(@Nullable String value) {
-		return value == null || value.isBlank();
 	}
 
 }

@@ -20,6 +20,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 /**
  * Login, refresh and logout orchestration.
@@ -49,15 +50,16 @@ public class AuthService {
 		this.authenticationManager
 			.authenticate(UsernamePasswordAuthenticationToken.unauthenticated(username, password));
 		this.refreshTokenService.deleteExpired();
-		Account account = this.accountLookupRepository.find(username).orElseThrow();
+		Account account = this.accountLookupRepository.find(username);
+		Assert.state(account != null, () -> "Account not found for authenticated user: " + username);
 		IssuedRefreshToken refreshToken = this.refreshTokenService.startFamily(username);
 		return new LoginResult(this.issuer.issue(account), refreshToken, account);
 	}
 
 	public RefreshOutcome refresh(String refreshToken) {
 		RefreshResult result = this.refreshTokenService.rotate(refreshToken);
-		Account account = this.accountLookupRepository.find(result.username()).filter(Account::enabled).orElse(null);
-		if (account == null) {
+		Account account = this.accountLookupRepository.find(result.username());
+		if (account == null || !account.enabled()) {
 			this.refreshTokenService.revokeFamily(refreshToken);
 			throw new InvalidRefreshTokenException();
 		}

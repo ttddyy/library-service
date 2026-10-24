@@ -17,9 +17,9 @@
 package net.ttddyy.book.libraryservice.auth;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -38,11 +38,12 @@ public class AccountLookupRepository {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	public Optional<Account> find(String username) {
+	@Nullable
+	public Account find(String username) {
 		List<Boolean> enabled = this.jdbcTemplate.queryForList("SELECT enabled FROM users WHERE username = ?",
 				Boolean.class, username);
 		if (enabled.isEmpty()) {
-			return Optional.empty();
+			return null;
 		}
 		List<String> roles = this.jdbcTemplate
 			.queryForList("SELECT authority FROM authorities WHERE username = ? ORDER BY authority", String.class,
@@ -57,7 +58,7 @@ public class AccountLookupRepository {
 				: this.jdbcTemplate.queryForList(
 						"SELECT school_id FROM user_schools WHERE username = ? ORDER BY school_id", String.class,
 						username);
-		return Optional.of(new Account(username, probe.enabled(), roles, schools));
+		return new Account(username, probe.enabled(), roles, schools);
 	}
 
 }

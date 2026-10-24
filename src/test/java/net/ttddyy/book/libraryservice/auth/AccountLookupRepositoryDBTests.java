@@ -17,7 +17,6 @@
 package net.ttddyy.book.libraryservice.auth;
 
 import java.util.List;
-import java.util.Optional;
 
 import net.ttddyy.book.libraryservice.DbTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,7 +57,8 @@ class AccountLookupRepositoryDBTests {
 
 	@Test
 	void findsUserWithRolesAndSchools() {
-		Account account = this.repository.find("alice").orElseThrow();
+		Account account = this.repository.find("alice");
+		assertThat(account).isNotNull();
 		assertThat(account.username()).isEqualTo("alice");
 		assertThat(account.enabled()).isTrue();
 		assertThat(account.roles()).containsExactly("SCHOOL_ADMIN");
@@ -68,7 +68,8 @@ class AccountLookupRepositoryDBTests {
 
 	@Test
 	void superAdminGetsAllSchools() {
-		Account account = this.repository.find("root").orElseThrow();
+		Account account = this.repository.find("root");
+		assertThat(account).isNotNull();
 		List<String> all = this.jdbcTemplate.queryForList("SELECT id FROM schools ORDER BY id", String.class);
 		assertThat(account.isSuperAdmin()).isTrue();
 		assertThat(account.schools()).isNotEmpty().isEqualTo(all);
@@ -76,13 +77,14 @@ class AccountLookupRepositoryDBTests {
 
 	@Test
 	void userWithoutSchools() {
-		assertThat(this.repository.find("bob").orElseThrow().schools()).isEmpty();
+		Account account = this.repository.find("bob");
+		assertThat(account).isNotNull();
+		assertThat(account.schools()).isEmpty();
 	}
 
 	@Test
-	void unknownUserIsEmpty() {
-		Optional<Account> account = this.repository.find("nobody");
-		assertThat(account).isEmpty();
+	void unknownUserIsNull() {
+		assertThat(this.repository.find("nobody")).isNull();
 	}
 
 	private void user(String username, String authority, String... schools) {

@@ -26,12 +26,12 @@ Or, use the development time support.
 > ./mvnw spring-boot:test-run
 ```
 * In this mode, local postgres is used if available; otherwise, it starts a postgres container via Testcontainers (Docker required).
+* The `dev` profile is activated automatically.
 
 Run with the `dev` profile (uses the dev JWT keys in `dev/jwt/` and `cookie-secure=false`).
 ```shell
 > ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 ```
-`spring-boot:test-run` (above) also needs the profile: `./mvnw spring-boot:test-run -Dspring-boot.run.profiles=dev`.
 
 Using env variable to specify various values
 ```shell

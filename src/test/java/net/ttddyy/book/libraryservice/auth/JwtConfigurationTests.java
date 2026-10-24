@@ -97,6 +97,12 @@ class JwtConfigurationTests {
 	}
 
 	@Test
+	void missingKeyIdFailsStartup() {
+		this.runner.withPropertyValues("library-service.auth.jwt.key-id=")
+			.run((context) -> assertThat(context.getStartupFailure()).rootCause().hasMessageContaining("key id"));
+	}
+
+	@Test
 	void mismatchedKeysFailStartup(@TempDir Path dir) throws Exception {
 		byte[] encoded = generateKeyPair().getPublic().getEncoded();
 		String pem = "-----BEGIN PUBLIC KEY-----\n"

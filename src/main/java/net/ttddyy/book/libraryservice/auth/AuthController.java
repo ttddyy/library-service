@@ -22,6 +22,9 @@ import java.util.Map;
 
 import net.ttddyy.book.libraryservice.LibraryServiceProperties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -29,6 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -47,6 +51,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+	private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
 	private static final String COOKIE_NAME = "refresh_token";
 
 	private static final String COOKIE_PATH = "/api/auth";
@@ -63,6 +69,8 @@ public class AuthController {
 		this.clock = clock;
 	}
 
+	// JSON body required (415 otherwise) on purpose: blocks cross-site form-post login
+	// CSRF
 	@PostMapping("/login")
 	ResponseEntity<LoginResponse> login(@RequestBody(required = false) @Nullable LoginRequest request) {
 		if (request == null || isBlank(request.username()) || isBlank(request.password())) {
@@ -105,7 +113,10 @@ public class AuthController {
 	}
 
 	@ExceptionHandler({ AuthenticationException.class, HttpMessageNotReadableException.class })
-	ResponseEntity<Map<String, String>> invalidCredentials() {
+	ResponseEntity<Map<String, String>> invalidCredentials(Exception ex) {
+		if (ex instanceof InternalAuthenticationServiceException) {
+			logger.warn("Login failed due to an internal authentication error", ex);
+		}
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid_credentials"));
 	}
 

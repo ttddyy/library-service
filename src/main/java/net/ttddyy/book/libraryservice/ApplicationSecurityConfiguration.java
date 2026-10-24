@@ -38,6 +38,8 @@ import org.springframework.security.oauth2.server.resource.web.BearerTokenResolv
 import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -91,7 +93,9 @@ public class ApplicationSecurityConfiguration {
 	@Bean
 	BearerTokenResolver bearerTokenResolver() {
 		DefaultBearerTokenResolver delegate = new DefaultBearerTokenResolver();
-		return (request) -> request.getRequestURI().startsWith("/api/auth/") ? null : delegate.resolve(request);
+		RequestMatcher authEndpoints = PathPatternRequestMatcher.withDefaults()
+			.matcher(HttpMethod.POST, "/api/auth/**");
+		return (request) -> authEndpoints.matches(request) ? null : delegate.resolve(request);
 	}
 
 	@Bean

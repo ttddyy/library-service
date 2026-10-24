@@ -52,8 +52,10 @@ To build an artifact(executable jar)
 The artifact is generated under `target` directory. (e.g. `target/library-service-0.0.1-SNAPSHOT.jar`)
 To run it:
 ```shell
-> java -jar target/library-service-0.0.1-SNAPSHOT.jar
+> java -jar target/library-service-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev
 ```
+The `dev` profile uses the dev JWT keys via paths relative to the repo root, so run it from the repo root (dev keys are for local use only).
+Otherwise set `LIBRARY_SERVICE_AUTH_JWT_KEY_ID`, `LIBRARY_SERVICE_AUTH_JWT_PRIVATE_KEY` and `LIBRARY_SERVICE_AUTH_JWT_PUBLIC_KEY`.
 
 ## Run Application from container image with Docker
 
@@ -64,6 +66,10 @@ Specify environment properties with `-e` option.
    -e SPRING_DATASOURCE_URL=jdbc:postgres://host.docker.internal:5432/library_service  \
    -e SPRING_DATASOURCE_USERNAME=root  \
    -e SPRING_DATASOURCE_PASSWORD=password  \
+   -e LIBRARY_SERVICE_AUTH_JWT_KEY_ID=dev  \
+   -e LIBRARY_SERVICE_AUTH_JWT_PRIVATE_KEY=file:/etc/library-service/jwt/private.pem  \
+   -e LIBRARY_SERVICE_AUTH_JWT_PUBLIC_KEY=file:/etc/library-service/jwt/public.pem  \
+   -v $PWD/dev/jwt:/etc/library-service/jwt:ro  \
    docker.io/library/library-service:0.0.1-SNAPSHOT
 ```
 
@@ -143,6 +149,8 @@ rotating refresh token in an HttpOnly cookie.
    * The refresh session length is absolute from login (`refresh-token-ttl`); rotation does not extend it.
    * Role and school changes are picked up on the next refresh.
 4. `POST /api/auth/logout` with header `X-Requested-With`: always `204`, deletes the session and clears the cookie.
+
+To delete a user, first delete its `refresh_tokens`, `user_schools` and `authorities` rows, then the `users` row (no `ON DELETE CASCADE`).
 
 Each login starts an independent session, so a user can be logged in on several machines. UI and API are expected to
 share one origin (no CORS).

@@ -39,6 +39,7 @@ import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * Loads the RSA key pair and exposes the {@link JwtEncoder} and {@link JwtDecoder}.
@@ -57,6 +58,7 @@ class JwtConfiguration {
 	JwtConfiguration(LibraryServiceProperties properties) throws IOException {
 		this.auth = properties.getAuth();
 		LibraryServiceProperties.Auth.Jwt jwt = this.auth.getJwt();
+		Assert.state(StringUtils.hasText(jwt.getKeyId()), "JWT key id is missing");
 		Resource privateResource = jwt.getPrivateKey();
 		Resource publicResource = jwt.getPublicKey();
 		Assert.state(privateResource != null && privateResource.exists(), "JWT private key is missing");

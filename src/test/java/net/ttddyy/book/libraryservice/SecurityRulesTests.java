@@ -56,6 +56,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -158,6 +159,16 @@ class SecurityRulesTests {
 				.header("X-Requested-With", "x")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer garbage"))
 			.andExpect(status().isNoContent());
+	}
+
+	@Test
+	void staleBearerIgnoredOnRefresh() throws Exception {
+		this.mvc
+			.perform(MockMvcRequestBuilders.post("/api/auth/refresh")
+				.header("X-Requested-With", "x")
+				.header(HttpHeaders.AUTHORIZATION, "Bearer garbage"))
+			.andExpect(status().isUnauthorized())
+			.andExpect(content().json("{\"error\":\"invalid_refresh_token\"}"));
 	}
 
 	@Test

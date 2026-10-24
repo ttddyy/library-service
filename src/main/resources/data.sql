@@ -6,6 +6,42 @@ VALUES ('ocean', 'Ocean School'),
        ('sky', 'Sky School')
 ;
 
+-- dev users; password for all is "password"
+INSERT INTO users (username, password, enabled)
+VALUES ('super-admin', '{bcrypt}$2a$10$4gl4WEH1jup/qQWtMnJ.w.xsLPx754du/Or/TPXc/oPPmvotCcFi6', TRUE),
+       ('ocean-user', '{bcrypt}$2a$10$4gl4WEH1jup/qQWtMnJ.w.xsLPx754du/Or/TPXc/oPPmvotCcFi6', TRUE),
+       ('ocean-admin', '{bcrypt}$2a$10$4gl4WEH1jup/qQWtMnJ.w.xsLPx754du/Or/TPXc/oPPmvotCcFi6', TRUE),
+       ('mountain-user', '{bcrypt}$2a$10$4gl4WEH1jup/qQWtMnJ.w.xsLPx754du/Or/TPXc/oPPmvotCcFi6', TRUE),
+       ('mountain-admin', '{bcrypt}$2a$10$4gl4WEH1jup/qQWtMnJ.w.xsLPx754du/Or/TPXc/oPPmvotCcFi6', TRUE),
+       ('river-user', '{bcrypt}$2a$10$4gl4WEH1jup/qQWtMnJ.w.xsLPx754du/Or/TPXc/oPPmvotCcFi6', TRUE),
+       ('river-admin', '{bcrypt}$2a$10$4gl4WEH1jup/qQWtMnJ.w.xsLPx754du/Or/TPXc/oPPmvotCcFi6', TRUE),
+       ('sky-user', '{bcrypt}$2a$10$4gl4WEH1jup/qQWtMnJ.w.xsLPx754du/Or/TPXc/oPPmvotCcFi6', TRUE),
+       ('sky-admin', '{bcrypt}$2a$10$4gl4WEH1jup/qQWtMnJ.w.xsLPx754du/Or/TPXc/oPPmvotCcFi6', TRUE)
+;
+
+INSERT INTO authorities (username, authority)
+VALUES ('super-admin', 'ROLE_SUPER_ADMIN'),
+       ('ocean-user', 'ROLE_USER'),
+       ('ocean-admin', 'ROLE_SCHOOL_ADMIN'),
+       ('mountain-user', 'ROLE_USER'),
+       ('mountain-admin', 'ROLE_SCHOOL_ADMIN'),
+       ('river-user', 'ROLE_USER'),
+       ('river-admin', 'ROLE_SCHOOL_ADMIN'),
+       ('sky-user', 'ROLE_USER'),
+       ('sky-admin', 'ROLE_SCHOOL_ADMIN')
+;
+
+INSERT INTO user_schools (username, school_id)
+VALUES ('ocean-user', 'ocean'),
+       ('ocean-admin', 'ocean'),
+       ('mountain-user', 'mountain'),
+       ('mountain-admin', 'mountain'),
+       ('river-user', 'river'),
+       ('river-admin', 'river'),
+       ('sky-user', 'sky'),
+       ('sky-admin', 'sky')
+;
+
 INSERT INTO checkout_limit_defaults (id, school_id, grade, max_books, max_days)
 VALUES -- ocean school
        (0, 'ocean', 0, 4, 28),

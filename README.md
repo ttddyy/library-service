@@ -26,10 +26,11 @@ Or, use the development time support.
 > ./mvnw spring-boot:test-run
 ```
 * In this mode, local postgres is used if available; otherwise, it starts a postgres container via Testcontainers (Docker required).
+* The `dev` profile is activated automatically.
 
-Change basic auth user/pass from command line
+Run with the `dev` profile (uses the dev JWT keys in `dev/jwt/` and `cookie-secure=false`).
 ```shell
-./mvnw spring-boot:run -Dspring-boot.run.jvmArguments='-Dspring.security.user.name=foo,-Dspring.security.user.password=bar'
+> ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
 Using env variable to specify various values
@@ -37,13 +38,10 @@ Using env variable to specify various values
 SPRING_DATASOURCE_URL=jdbc:postgres://localhost:5432/library_service  \
 SPRING_DATASOURCE_USERNAME=root  \
 SPRING_DATASOURCE_PASSWORD=password  \
-SPRING_SECURITY_USER_NAME=user  \
-SPRING_SECURITY_USER_PASSWORD=pass  \
-./mvnw spring-boot:run
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-Note:
-`SPRING_SECURITY_USER_NAME` and `SPRING_SECURITY_USER_PASSWORD` are used for Basic auth user & password. 
+The application fails to start without a valid JWT key pair. See [Authentication](#authentication).
 
 ## Run Application from artifact(executable jar)
 
@@ -54,8 +52,10 @@ To build an artifact(executable jar)
 The artifact is generated under `target` directory. (e.g. `target/library-service-0.0.1-SNAPSHOT.jar`)
 To run it:
 ```shell
-> java -jar target/library-service-0.0.1-SNAPSHOT.jar
+> java -jar target/library-service-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev
 ```
+The `dev` profile uses the dev JWT keys via paths relative to the repo root, so run it from the repo root (dev keys are for local use only).
+Otherwise set `LIBRARY_SERVICE_AUTH_JWT_KEY_ID`, `LIBRARY_SERVICE_AUTH_JWT_PRIVATE_KEY` and `LIBRARY_SERVICE_AUTH_JWT_PUBLIC_KEY`.
 
 ## Run Application from container image with Docker
 
@@ -66,6 +66,10 @@ Specify environment properties with `-e` option.
    -e SPRING_DATASOURCE_URL=jdbc:postgres://host.docker.internal:5432/library_service  \
    -e SPRING_DATASOURCE_USERNAME=root  \
    -e SPRING_DATASOURCE_PASSWORD=password  \
+   -e LIBRARY_SERVICE_AUTH_JWT_KEY_ID=dev  \
+   -e LIBRARY_SERVICE_AUTH_JWT_PRIVATE_KEY=file:/etc/library-service/jwt/private.pem  \
+   -e LIBRARY_SERVICE_AUTH_JWT_PUBLIC_KEY=file:/etc/library-service/jwt/public.pem  \
+   -v $PWD/dev/jwt:/etc/library-service/jwt:ro  \
    docker.io/library/library-service:0.0.1-SNAPSHOT
 ```
 
@@ -115,9 +119,167 @@ Use [Spring Java Format](https://github.com/spring-io/spring-javaformat).
 
 # Endpoints
 
-For now, all endpoints is protected with Basic Auth.
+Swagger API: http://localhost:8080/swagger-ui.html (declares a `bearer-jwt` scheme; use "Authorize" with an access token)
 
-Swagger API: http://localhost:8080/swagger-ui.html
+# Authentication
+
+Users log in with a username/password and receive a short-lived RS256 access token (JWT) in the response body and a
+rotating refresh token in an HttpOnly cookie.
+
+## Flow for the UI
+
+1. `POST /api/auth/login` with `{"username": "...", "password": "..."}`.
+   Response `200`:
+   ```json
+   {"access_token": "<jwt>", "token_type": "Bearer", "expires_in": 900,
+    "user": {"username": "ocean-admin", "roles": ["SCHOOL_ADMIN"], "schools": ["ocean"]}}
+   ```
+   plus `Set-Cookie: refresh_token=<value>; HttpOnly; Secure; SameSite=Strict; Path=/api/auth; Max-Age=<seconds until expiry>`.
+   Any failure returns `401 {"error":"invalid_credentials"}`.
+   Keep the access token in memory only.
+2. Call the API with `Authorization: Bearer <access_token>`.
+3. Before the access token expires (or on a `401`), `POST /api/auth/refresh` with header `X-Requested-With` (any value;
+   the browser sends the cookie automatically). Response `200`: `{"access_token": "<jwt>", "token_type": "Bearer", "expires_in": 900}`
+   and a new refresh cookie. Every `401` is `{"error":"invalid_refresh_token"}` and clears the cookie; send the user back to login.
+   * Requests to `/api/auth/**` ignore any `Authorization: Bearer` header, so refresh can be called while holding an
+     expired access token.
+   * Refresh tokens rotate on every use. Re-sending a just-rotated token within `refresh-reuse-grace` (default 10s,
+     e.g. two tabs) returns `200` with a new access token but no `Set-Cookie`. Re-sending it later is treated as theft:
+     the whole session (family) is deleted and `401` is returned.
+   * The refresh session length is absolute from login (`refresh-token-ttl`); rotation does not extend it.
+   * Role and school changes are picked up on the next refresh.
+4. `POST /api/auth/logout` with header `X-Requested-With`: always `204`, deletes the session and clears the cookie.
+
+To delete a user, first delete its `refresh_tokens`, `user_schools` and `authorities` rows, then the `users` row (no `ON DELETE CASCADE`).
+
+Each login starts an independent session, so a user can be logged in on several machines. UI and API are expected to
+share one origin (no CORS).
+
+HTTP Basic against the same `users`/`authorities` tables still works but is **temporary** and will be removed once the UI
+migrates. No Basic challenge is sent, so browsers do not show a login popup. `spring.security.user.*` is no longer used.
+
+## Roles
+
+Hierarchy: `SUPER_ADMIN` > `SCHOOL_ADMIN` > `USER`.
+
+| Endpoints | Role |
+|---|---|
+| health, `GET /api/schools`, `POST /api/auth/**` | none |
+| `POST /api/books`, `PUT /api/books/{id}`, `PUT /api/checkouts/limits/defaults`, `POST`/`PUT /api/checkouts/limits/schedules`, `DELETE /api/checkouts/limits/schedules/{id}` | `SCHOOL_ADMIN` |
+| other actuator endpoints | `SUPER_ADMIN` |
+| any other `/api/**` (all `GET`, checkout, return, book status change) | `USER` |
+
+Unauthenticated requests get `401` (`WWW-Authenticate: Bearer`); missing role gets `403`.
+
+## Configuration
+
+Properties under `library-service.auth`:
+
+| Property | Default | Notes |
+|---|---|---|
+| `issuer` | `library-service` | `iss` claim; validated on decode |
+| `access-token-ttl` | `15m` | |
+| `refresh-token-ttl` | `1d` | absolute session length |
+| `refresh-reuse-grace` | `10s` | |
+| `cookie-secure` | `true` | `Secure` attribute of the refresh cookie |
+| `jwt.key-id` | required | JWS header `kid` |
+| `jwt.private-key` | required | PKCS#8 PEM resource, e.g. `file:/etc/library-service/jwt/private.pem` |
+| `jwt.public-key` | required | X.509 PEM resource, e.g. `file:/etc/library-service/jwt/public.pem` |
+
+A missing, unreadable or mismatched key pair fails startup. The `dev` profile (`application-dev.properties`) points to
+the key pair committed under `dev/jwt/` (for local development and tests only).
+
+## Generate a key pair
+
+```shell
+openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out private.pem
+openssl pkey -in private.pem -pubout -out public.pem
+```
+`genpkey` writes PKCS#8, which is what the application expects.
+
+Mount as a Kubernetes Secret at `/etc/library-service/jwt`:
+```shell
+kubectl create secret generic library-service-jwt --from-file=private.pem --from-file=public.pem
+```
+```yaml
+# pod spec
+volumes:
+  - name: jwt
+    secret:
+      secretName: library-service-jwt
+containers:
+  - name: library-service
+    env:
+      - {name: LIBRARY_SERVICE_AUTH_JWT_KEY_ID, value: "2026-10"}
+      - {name: LIBRARY_SERVICE_AUTH_JWT_PRIVATE_KEY, value: "file:/etc/library-service/jwt/private.pem"}
+      - {name: LIBRARY_SERVICE_AUTH_JWT_PUBLIC_KEY, value: "file:/etc/library-service/jwt/public.pem"}
+    volumeMounts:
+      - {name: jwt, mountPath: /etc/library-service/jwt, readOnly: true}
+```
+
+## Database DDL for existing databases
+
+`schema.sql` creates these for new databases. For an existing database, run:
+```sql
+CREATE TABLE users
+(
+    username VARCHAR(50)  NOT NULL PRIMARY KEY,
+    password VARCHAR(500) NOT NULL,
+    enabled  BOOLEAN      NOT NULL
+);
+
+CREATE TABLE authorities
+(
+    username  VARCHAR(50) NOT NULL,
+    authority VARCHAR(50) NOT NULL,
+    CONSTRAINT fk_authorities__users FOREIGN KEY (username) REFERENCES users (username),
+    CONSTRAINT uc_authorities__username_authority UNIQUE (username, authority)
+);
+
+CREATE TABLE user_schools
+(
+    username  VARCHAR(50) NOT NULL,
+    school_id VARCHAR(8)  NOT NULL,
+    PRIMARY KEY (username, school_id),
+    CONSTRAINT fk_user_schools__users FOREIGN KEY (username) REFERENCES users (username),
+    CONSTRAINT fk_user_schools__schools FOREIGN KEY (school_id) REFERENCES schools (id)
+);
+
+CREATE TABLE refresh_tokens
+(
+    token_hash CHAR(64)    NOT NULL PRIMARY KEY,
+    family_id  UUID        NOT NULL,
+    username   VARCHAR(50) NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL,
+    rotated_at TIMESTAMPTZ,
+    CONSTRAINT fk_refresh_tokens__users FOREIGN KEY (username) REFERENCES users (username)
+);
+CREATE INDEX idx_refresh_tokens__family_id ON refresh_tokens (family_id);
+CREATE INDEX idx_refresh_tokens__expires_at ON refresh_tokens (expires_at);
+```
+
+## Provisioning users
+
+Passwords are stored with the `{bcrypt}` prefix; authorities with the `ROLE_` prefix. Generate a hash:
+```shell
+htpasswd -bnBC 10 "" 'the-password' | tr -d ':\n'
+```
+This prints a `$2y$10$...` hash, which Spring Security's BCrypt accepts as is.
+
+```sql
+INSERT INTO users (username, password, enabled) VALUES ('ocean-admin', '{bcrypt}$2y$10$...', TRUE);
+INSERT INTO authorities (username, authority) VALUES ('ocean-admin', 'ROLE_SCHOOL_ADMIN');
+INSERT INTO user_schools (username, school_id) VALUES ('ocean-admin', 'ocean');
+```
+`SUPER_ADMIN` users (`ROLE_SUPER_ADMIN`) need no `user_schools` rows.
+Because of the role hierarchy, one authority per user is enough.
+
+Revoke all sessions of a user (their access tokens still work until they expire):
+```sql
+DELETE FROM refresh_tokens WHERE username = '<username>';
+```
+
+To disable a user: `UPDATE users SET enabled = FALSE WHERE username = '<username>'` (takes effect on next refresh).
 
 # Development tips
 

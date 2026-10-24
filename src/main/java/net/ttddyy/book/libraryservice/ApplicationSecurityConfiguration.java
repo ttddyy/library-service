@@ -18,6 +18,8 @@ package net.ttddyy.book.libraryservice;
 
 import javax.sql.DataSource;
 
+import net.ttddyy.book.libraryservice.auth.Roles;
+
 import org.springframework.boot.health.actuate.endpoint.HealthEndpoint;
 import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
@@ -67,14 +69,15 @@ public class ApplicationSecurityConfiguration {
 			authz.requestMatchers(EndpointRequest.to(HealthEndpoint.class)).permitAll();
 			authz.requestMatchers(HttpMethod.GET, "/api/schools").permitAll();
 			authz.requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll();
-			authz.requestMatchers(HttpMethod.POST, "/api/books").hasRole("SCHOOL_ADMIN");
-			authz.requestMatchers(HttpMethod.PUT, "/api/books/{id}").hasRole("SCHOOL_ADMIN");
-			authz.requestMatchers(HttpMethod.PUT, "/api/checkouts/limits/defaults").hasRole("SCHOOL_ADMIN");
-			authz.requestMatchers(HttpMethod.POST, "/api/checkouts/limits/schedules").hasRole("SCHOOL_ADMIN");
-			authz.requestMatchers(HttpMethod.PUT, "/api/checkouts/limits/schedules").hasRole("SCHOOL_ADMIN");
-			authz.requestMatchers(HttpMethod.DELETE, "/api/checkouts/limits/schedules/{id}").hasRole("SCHOOL_ADMIN");
-			authz.requestMatchers(EndpointRequest.toAnyEndpoint()).hasRole("SUPER_ADMIN");
-			authz.requestMatchers("/api/**").hasRole("USER");
+			authz.requestMatchers(HttpMethod.POST, "/api/books").hasRole(Roles.SCHOOL_ADMIN);
+			authz.requestMatchers(HttpMethod.PUT, "/api/books/{id}").hasRole(Roles.SCHOOL_ADMIN);
+			authz.requestMatchers(HttpMethod.PUT, "/api/checkouts/limits/defaults").hasRole(Roles.SCHOOL_ADMIN);
+			authz.requestMatchers(HttpMethod.POST, "/api/checkouts/limits/schedules").hasRole(Roles.SCHOOL_ADMIN);
+			authz.requestMatchers(HttpMethod.PUT, "/api/checkouts/limits/schedules").hasRole(Roles.SCHOOL_ADMIN);
+			authz.requestMatchers(HttpMethod.DELETE, "/api/checkouts/limits/schedules/{id}")
+				.hasRole(Roles.SCHOOL_ADMIN);
+			authz.requestMatchers(EndpointRequest.toAnyEndpoint()).hasRole(Roles.SUPER_ADMIN);
+			authz.requestMatchers("/api/**").hasRole(Roles.USER);
 			authz.anyRequest().denyAll();
 		});
 		http.csrf(csrf -> csrf.disable()); // bearer tokens are not sent automatically
@@ -101,10 +104,10 @@ public class ApplicationSecurityConfiguration {
 	@Bean
 	RoleHierarchy roleHierarchy() {
 		return RoleHierarchyImpl.withDefaultRolePrefix()
-			.role("SUPER_ADMIN")
-			.implies("SCHOOL_ADMIN")
-			.role("SCHOOL_ADMIN")
-			.implies("USER")
+			.role(Roles.SUPER_ADMIN)
+			.implies(Roles.SCHOOL_ADMIN)
+			.role(Roles.SCHOOL_ADMIN)
+			.implies(Roles.USER)
 			.build();
 	}
 

@@ -26,7 +26,7 @@ import java.util.List;
 public record Account(String username, boolean enabled, List<String> roles, List<String> schools) {
 
 	public boolean isSuperAdmin() {
-		return this.roles.contains("SUPER_ADMIN");
+		return this.roles.contains(Roles.SUPER_ADMIN);
 	}
 
 }

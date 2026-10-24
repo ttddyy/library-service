@@ -19,6 +19,8 @@ package net.ttddyy.book.libraryservice.member;
 import net.ttddyy.book.libraryservice.DbTest;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
@@ -63,6 +65,27 @@ class MemberServiceDBTests {
 		assertThat(page).isNotNull();
 		assertThat(page.getTotalElements()).isEqualTo(1);
 		assertThat(page.getContent()).first().extracting(Member::getId).isEqualTo(20L);
+	}
+
+	@Test
+	void listClasses() {
+		String sql = """
+					INSERT INTO members (id, firstname_en, lastname_en, school_id, grade, class_number, active)
+					VALUES	(10, 'a', 'a', 'sky', 2, 1, true),
+							(20, 'b', 'b', 'sky', 1, 3, true),
+							(30, 'c', 'c', 'sky', 1, 3, true),
+							(40, 'd', 'd', 'sky', 1, 1, true),
+							(50, 'e', 'e', 'sky', 3, 1, false),
+							(60, 'f', 'f', 'sky', 4, null, true),
+							(70, 'g', 'g', 'ocean', 5, 5, true);
+				""";
+		this.jdbcTemplate.update(sql);
+
+		List<MemberClassDto> result = this.memberService.listClasses("sky");
+		assertThat(result).containsExactly(new MemberClassDto(1, 1), new MemberClassDto(1, 3),
+				new MemberClassDto(2, 1));
+
+		assertThat(this.memberService.listClasses("unknown")).isEmpty();
 	}
 
 }

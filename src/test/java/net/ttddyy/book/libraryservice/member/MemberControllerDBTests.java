@@ -16,6 +16,8 @@
 
 package net.ttddyy.book.libraryservice.member;
 
+import java.util.List;
+
 import net.ttddyy.book.libraryservice.DbTest;
 import org.junit.jupiter.api.Test;
 
@@ -106,6 +108,23 @@ class MemberControllerDBTests {
 		assertThat(result.getNumber()).isEqualTo(1);
 		assertThat(result.getTotalPages()).isEqualTo(2);
 		assertThat(result.getTotalElements()).isEqualTo(2);
+	}
+
+	@Test
+	void classes() {
+		Member member = new Member();
+		member.setId(10L);
+		member.setActive(true);
+		member.setFirstnameEn("member-1");
+		member.setLastnameEn("last-1");
+		member.setSchoolId("school-A");
+		member.setGrade(1);
+		member.setClassNumber(3);
+		this.entityManager.persist(member);
+		this.entityManager.flush();
+
+		List<MemberClassDto> result = this.controller.classes("school-A");
+		assertThat(result).containsExactly(new MemberClassDto(1, 3));
 	}
 
 }

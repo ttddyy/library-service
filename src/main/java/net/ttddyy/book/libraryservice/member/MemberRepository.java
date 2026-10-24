@@ -17,7 +17,10 @@
 
 package net.ttddyy.book.libraryservice.member;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.ListQueryByExampleExecutor;
 import org.springframework.stereotype.Repository;
 
@@ -26,5 +29,13 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long>, ListQueryByExampleExecutor<Member> {
+
+	@Query("""
+			select distinct new net.ttddyy.book.libraryservice.member.MemberClassDto(m.grade, m.classNumber)
+			from Member m
+			where m.schoolId = :schoolId and m.active = true and m.grade is not null and m.classNumber is not null
+			order by m.grade, m.classNumber
+			""")
+	List<MemberClassDto> findClasses(String schoolId);
 
 }

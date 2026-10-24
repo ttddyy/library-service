@@ -16,6 +16,8 @@
 
 package net.ttddyy.book.libraryservice.member;
 
+import java.util.List;
+
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,6 +44,11 @@ class MemberController {
 			@ParameterObject Pageable pageable) {
 		Page<Member> page = this.memberService.list(schoolId, pageable);
 		return MemberMapper.INSTANCE.toDtoPage(page);
+	}
+
+	@GetMapping("/api/members/classes")
+	List<MemberClassDto> classes(@RequestParam String schoolId) {
+		return this.memberService.listClasses(schoolId);
 	}
 
 	@GetMapping("/api/members/{id}")

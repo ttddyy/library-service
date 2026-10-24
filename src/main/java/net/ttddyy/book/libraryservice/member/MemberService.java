@@ -16,6 +16,8 @@
 
 package net.ttddyy.book.libraryservice.member;
 
+import java.util.List;
+
 import org.hibernate.Hibernate;
 
 import org.springframework.data.domain.Example;
@@ -44,6 +46,10 @@ public class MemberService {
 		Member member = new Member();
 		member.setSchoolId(schoolId);
 		return this.memberRepository.findAll(Example.of(member), pageable);
+	}
+
+	public List<MemberClassDto> listClasses(String schoolId) {
+		return this.memberRepository.findClasses(schoolId);
 	}
 
 	public Member get(long id) {

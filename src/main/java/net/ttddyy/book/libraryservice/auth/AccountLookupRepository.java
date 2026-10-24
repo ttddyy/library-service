@@ -20,21 +20,21 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 /**
  * Loads {@link Account} from the JDBC user store.
  *
  * @author Tadaya Tsuyukubo
  */
-@Component
-public class AccountLookup {
+@Repository
+public class AccountLookupRepository {
 
 	private static final String ROLE_PREFIX = "ROLE_";
 
 	private final JdbcTemplate jdbcTemplate;
 
-	AccountLookup(JdbcTemplate jdbcTemplate) {
+	AccountLookupRepository(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 

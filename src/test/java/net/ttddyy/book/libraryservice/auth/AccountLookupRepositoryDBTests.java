@@ -33,18 +33,18 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link AccountLookup} with DB.
+ * Tests for {@link AccountLookupRepository} with DB.
  *
  * @author Tadaya Tsuyukubo
  */
 @JdbcTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
-@Import(AccountLookup.class)
+@Import(AccountLookupRepository.class)
 @DbTest
-class AccountLookupDBTests {
+class AccountLookupRepositoryDBTests {
 
 	@Autowired
-	AccountLookup lookup;
+	AccountLookupRepository repository;
 
 	@Autowired
 	JdbcTemplate jdbcTemplate;
@@ -58,7 +58,7 @@ class AccountLookupDBTests {
 
 	@Test
 	void findsUserWithRolesAndSchools() {
-		Account account = this.lookup.find("alice").orElseThrow();
+		Account account = this.repository.find("alice").orElseThrow();
 		assertThat(account.username()).isEqualTo("alice");
 		assertThat(account.enabled()).isTrue();
 		assertThat(account.roles()).containsExactly("SCHOOL_ADMIN");
@@ -68,7 +68,7 @@ class AccountLookupDBTests {
 
 	@Test
 	void superAdminGetsAllSchools() {
-		Account account = this.lookup.find("root").orElseThrow();
+		Account account = this.repository.find("root").orElseThrow();
 		List<String> all = this.jdbcTemplate.queryForList("SELECT id FROM schools ORDER BY id", String.class);
 		assertThat(account.isSuperAdmin()).isTrue();
 		assertThat(account.schools()).isNotEmpty().isEqualTo(all);
@@ -76,12 +76,12 @@ class AccountLookupDBTests {
 
 	@Test
 	void userWithoutSchools() {
-		assertThat(this.lookup.find("bob").orElseThrow().schools()).isEmpty();
+		assertThat(this.repository.find("bob").orElseThrow().schools()).isEmpty();
 	}
 
 	@Test
 	void unknownUserIsEmpty() {
-		Optional<Account> account = this.lookup.find("nobody");
+		Optional<Account> account = this.repository.find("nobody");
 		assertThat(account).isEmpty();
 	}
 

@@ -31,16 +31,16 @@ public class AuthService {
 
 	private final AuthenticationManager authenticationManager;
 
-	private final AccountLookup accountLookup;
+	private final AccountLookupRepository accountLookupRepository;
 
 	private final AccessTokenIssuer issuer;
 
 	private final RefreshTokenService refreshTokenService;
 
-	AuthService(AuthenticationManager authenticationManager, AccountLookup accountLookup, AccessTokenIssuer issuer,
-			RefreshTokenService refreshTokenService) {
+	AuthService(AuthenticationManager authenticationManager, AccountLookupRepository accountLookupRepository,
+			AccessTokenIssuer issuer, RefreshTokenService refreshTokenService) {
 		this.authenticationManager = authenticationManager;
-		this.accountLookup = accountLookup;
+		this.accountLookupRepository = accountLookupRepository;
 		this.issuer = issuer;
 		this.refreshTokenService = refreshTokenService;
 	}
@@ -49,14 +49,14 @@ public class AuthService {
 		this.authenticationManager
 			.authenticate(UsernamePasswordAuthenticationToken.unauthenticated(username, password));
 		this.refreshTokenService.deleteExpired();
-		Account account = this.accountLookup.find(username).orElseThrow();
+		Account account = this.accountLookupRepository.find(username).orElseThrow();
 		IssuedRefreshToken refreshToken = this.refreshTokenService.startFamily(username);
 		return new LoginResult(this.issuer.issue(account), refreshToken, account);
 	}
 
 	public RefreshOutcome refresh(String refreshToken) {
 		RefreshResult result = this.refreshTokenService.rotate(refreshToken);
-		Account account = this.accountLookup.find(result.username()).filter(Account::enabled).orElse(null);
+		Account account = this.accountLookupRepository.find(result.username()).filter(Account::enabled).orElse(null);
 		if (account == null) {
 			this.refreshTokenService.revokeFamily(refreshToken);
 			throw new InvalidRefreshTokenException();

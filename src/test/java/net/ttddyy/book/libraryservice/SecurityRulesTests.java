@@ -147,7 +147,17 @@ class SecurityRulesTests {
 	void publicEndpoints() throws Exception {
 		this.mvc.perform(MockMvcRequestBuilders.get("/api/schools")).andExpect(status().isOk());
 		this.mvc.perform(MockMvcRequestBuilders.get("/actuator/health")).andExpect(status().isOk());
-		assertAllowed(this.mvc.perform(MockMvcRequestBuilders.post("/api/auth/logout")));
+		assertAllowed(
+				this.mvc.perform(MockMvcRequestBuilders.post("/api/auth/logout").header("X-Requested-With", "x")));
+	}
+
+	@Test
+	void staleBearerIgnoredOnAuthEndpoints() throws Exception {
+		this.mvc
+			.perform(MockMvcRequestBuilders.post("/api/auth/logout")
+				.header("X-Requested-With", "x")
+				.header(HttpHeaders.AUTHORIZATION, "Bearer garbage"))
+			.andExpect(status().isNoContent());
 	}
 
 	@Test

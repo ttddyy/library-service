@@ -16,36 +16,89 @@
 
 package net.ttddyy.book.libraryservice;
 
+import javax.sql.DataSource;
+
 import org.springframework.boot.health.actuate.endpoint.HealthEndpoint;
 import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
  * @author Tadaya Tsuyukubo
  */
-
 @Configuration(proxyBeanMethods = false)
 class ApplicationSecurityConfiguration {
 
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		// require authentication on api endpoints but make health endpoint public
+		JwtGrantedAuthoritiesConverter authorities = new JwtGrantedAuthoritiesConverter();
+		authorities.setAuthoritiesClaimName("roles");
+		authorities.setAuthorityPrefix("ROLE_");
+		JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+		converter.setJwtGrantedAuthoritiesConverter(authorities);
+		converter.setPrincipalClaimName("sub");
+
+		// Bearer challenge only; no Basic challenge so browsers never show a login popup
+		BearerTokenAuthenticationEntryPoint entryPoint = new BearerTokenAuthenticationEntryPoint();
+
 		http.securityMatchers(matchers -> {
 			matchers.requestMatchers("/api/**");
 			matchers.requestMatchers(EndpointRequest.toAnyEndpoint());
 		}).authorizeHttpRequests(authz -> {
 			authz.requestMatchers(EndpointRequest.to(HealthEndpoint.class)).permitAll();
-			authz.requestMatchers("/api/schools").permitAll();
-			authz.anyRequest().authenticated();
+			authz.requestMatchers(HttpMethod.GET, "/api/schools").permitAll();
+			authz.requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll();
+			authz.requestMatchers(HttpMethod.POST, "/api/books").hasRole("SCHOOL_ADMIN");
+			authz.requestMatchers(HttpMethod.PUT, "/api/books/{id}").hasRole("SCHOOL_ADMIN");
+			authz.requestMatchers(HttpMethod.PUT, "/api/checkouts/limits/defaults").hasRole("SCHOOL_ADMIN");
+			authz.requestMatchers(HttpMethod.POST, "/api/checkouts/limits/schedules").hasRole("SCHOOL_ADMIN");
+			authz.requestMatchers(HttpMethod.PUT, "/api/checkouts/limits/schedules").hasRole("SCHOOL_ADMIN");
+			authz.requestMatchers(HttpMethod.DELETE, "/api/checkouts/limits/schedules/{id}").hasRole("SCHOOL_ADMIN");
+			authz.requestMatchers(EndpointRequest.toAnyEndpoint()).hasRole("SUPER_ADMIN");
+			authz.requestMatchers("/api/**").hasRole("USER");
+			authz.anyRequest().denyAll();
 		});
-		http.csrf(csrf -> csrf.disable()); // need for POST requests
-		http.httpBasic(withDefaults());
+		http.csrf(csrf -> csrf.disable()); // bearer tokens are not sent automatically
+		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+		http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(converter)));
+		http.httpBasic(basic -> basic.authenticationEntryPoint(entryPoint));
+		http.exceptionHandling(handling -> handling.authenticationEntryPoint(entryPoint));
 		return http.build();
+	}
+
+	@Bean
+	RoleHierarchy roleHierarchy() {
+		return RoleHierarchyImpl.withDefaultRolePrefix()
+			.role("SUPER_ADMIN")
+			.implies("SCHOOL_ADMIN")
+			.role("SCHOOL_ADMIN")
+			.implies("USER")
+			.build();
+	}
+
+	@Bean
+	UserDetailsService userDetailsService(DataSource dataSource) {
+		return new JdbcUserDetailsManager(dataSource);
+	}
+
+	@Bean
+	AuthenticationManager authenticationManager(UserDetailsService userDetailsService) {
+		DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
+		return new ProviderManager(provider);
 	}
 
 }

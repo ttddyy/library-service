@@ -22,13 +22,13 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -39,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Tadaya Tsuyukubo
  */
 @WebMvcTest(SchoolController.class)
+@WithMockUser
 class SchoolControllerMockMvcTests {
 
 	@Autowired
@@ -58,7 +59,7 @@ class SchoolControllerMockMvcTests {
 
 		given(this.schoolService.list()).willReturn(List.of(school1, school2));
 
-		this.mvc.perform(get("/api/schools").with(httpBasic("user", "pass")))
+		this.mvc.perform(get("/api/schools"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$..id", hasSize(2)))
 			.andExpect(jsonPath("$..id", containsInAnyOrder("foo", "bar")));

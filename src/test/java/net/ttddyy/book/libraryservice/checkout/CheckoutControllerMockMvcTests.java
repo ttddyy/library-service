@@ -27,6 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
@@ -44,6 +45,7 @@ import static org.mockito.BDDMockito.given;
  */
 @WebMvcTest(CheckoutController.class)
 @AutoConfigureWebTestClient
+@WithMockUser
 class CheckoutControllerMockMvcTests {
 
 	@Autowired
@@ -87,7 +89,6 @@ class CheckoutControllerMockMvcTests {
 
 		this.webTestClient.get()
 			.uri("/api/checkouts/overdue")
-			.headers((header) -> header.setBasicAuth("user", "pass"))
 			.exchange()
 			.expectStatus()
 			.isOk()
@@ -147,7 +148,6 @@ class CheckoutControllerMockMvcTests {
 
 		this.webTestClient.get()
 			.uri("/api/checkouts/overdue")
-			.headers((header) -> header.setBasicAuth("user", "pass"))
 			.exchange()
 			.expectStatus()
 			.isOk()

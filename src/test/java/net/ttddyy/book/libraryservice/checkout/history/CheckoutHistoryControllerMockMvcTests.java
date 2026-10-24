@@ -32,6 +32,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.BodyContentSpec;
@@ -50,6 +51,7 @@ import static org.mockito.Mockito.verify;
  */
 @WebMvcTest(CheckoutHistoryController.class)
 @AutoConfigureWebTestClient
+@WithMockUser
 class CheckoutHistoryControllerMockMvcTests {
 
 	@Autowired
@@ -71,7 +73,6 @@ class CheckoutHistoryControllerMockMvcTests {
 
 		this.webTestClient.get()
 			.uri("/api/checkouts/history?bookId=10&memberId=20")
-			.headers((header) -> header.setBasicAuth("user", "pass"))
 			.exchange()
 			.expectStatus()
 			.isOk()
@@ -108,10 +109,7 @@ class CheckoutHistoryControllerMockMvcTests {
 		Page<CheckoutHistory> page = new PageImpl<>(List.of(history));
 		given(this.checkoutHistoryService.listByBook(eq(10L), any(Pageable.class))).willReturn(page);
 
-		ResponseSpec spec = this.webTestClient.get()
-			.uri("/api/checkouts/history?bookId=10")
-			.headers((header) -> header.setBasicAuth("user", "pass"))
-			.exchange();
+		ResponseSpec spec = this.webTestClient.get().uri("/api/checkouts/history?bookId=10").exchange();
 
 		// verify
 		spec.expectStatus().isOk();
@@ -128,10 +126,7 @@ class CheckoutHistoryControllerMockMvcTests {
 		Page<CheckoutHistory> page = new PageImpl<>(List.of(history));
 		given(this.checkoutHistoryService.listByMember(eq(20L), any(Pageable.class))).willReturn(page);
 
-		ResponseSpec spec = this.webTestClient.get()
-			.uri("/api/checkouts/history?memberId=20")
-			.headers((header) -> header.setBasicAuth("user", "pass"))
-			.exchange();
+		ResponseSpec spec = this.webTestClient.get().uri("/api/checkouts/history?memberId=20").exchange();
 
 		// verify
 		spec.expectStatus().isOk();

@@ -1,3 +1,7 @@
+DROP TABLE IF EXISTS refresh_tokens;
+DROP TABLE IF EXISTS user_schools;
+DROP TABLE IF EXISTS authorities;
+DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS checkout_limit_schedules;
 DROP TABLE IF EXISTS checkout_limit_defaults;
 DROP TABLE IF EXISTS activities;

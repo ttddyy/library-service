@@ -11,6 +11,43 @@ CREATE TABLE schools
 );
 
 
+CREATE TABLE users
+(
+    username VARCHAR(50)  NOT NULL PRIMARY KEY,
+    password VARCHAR(500) NOT NULL,
+    enabled  BOOLEAN      NOT NULL
+);
+
+CREATE TABLE authorities
+(
+    username  VARCHAR(50) NOT NULL,
+    authority VARCHAR(50) NOT NULL,
+    CONSTRAINT fk_authorities__users FOREIGN KEY (username) REFERENCES users (username),
+    CONSTRAINT uc_authorities__username_authority UNIQUE (username, authority)
+);
+
+CREATE TABLE user_schools
+(
+    username  VARCHAR(50) NOT NULL,
+    school_id VARCHAR(8)  NOT NULL,
+    PRIMARY KEY (username, school_id),
+    CONSTRAINT fk_user_schools__users FOREIGN KEY (username) REFERENCES users (username),
+    CONSTRAINT fk_user_schools__schools FOREIGN KEY (school_id) REFERENCES schools (id)
+);
+
+CREATE TABLE refresh_tokens
+(
+    token_hash CHAR(64)    NOT NULL PRIMARY KEY,
+    family_id  UUID        NOT NULL,
+    username   VARCHAR(50) NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL,
+    rotated_at TIMESTAMPTZ,
+    CONSTRAINT fk_refresh_tokens__users FOREIGN KEY (username) REFERENCES users (username)
+);
+CREATE INDEX idx_refresh_tokens__family_id ON refresh_tokens (family_id);
+CREATE INDEX idx_refresh_tokens__expires_at ON refresh_tokens (expires_at);
+
+
 CREATE TABLE book_categories
 (
     id                   INT          NOT NULL PRIMARY KEY,

@@ -22,7 +22,6 @@ import java.util.List;
 
 import net.ttddyy.book.libraryservice.DbTest;
 import net.ttddyy.book.libraryservice.MockClocks.MockClock;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,6 +34,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -46,6 +46,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 @SpringBootTest
 @DbTest
+// Each test rolls back, which also removes the data it inserted.
+@Transactional
 @ActiveProfiles("dev")
 class AuthServiceDBTests {
 
@@ -60,19 +62,10 @@ class AuthServiceDBTests {
 
 	@BeforeEach
 	void setUp() {
-		cleanUp();
 		user("as-admin", true);
 		this.jdbcTemplate.update("INSERT INTO authorities (username, authority) VALUES ('as-admin', 'ROLE_USER')");
 		this.jdbcTemplate.update("INSERT INTO user_schools (username, school_id) VALUES ('as-admin', 'ocean')");
 		user("as-disabled", false);
-	}
-
-	@AfterEach
-	void cleanUp() {
-		this.jdbcTemplate.update("DELETE FROM refresh_tokens WHERE username LIKE 'as-%'");
-		this.jdbcTemplate.update("DELETE FROM authorities WHERE username LIKE 'as-%'");
-		this.jdbcTemplate.update("DELETE FROM user_schools WHERE username LIKE 'as-%'");
-		this.jdbcTemplate.update("DELETE FROM users WHERE username LIKE 'as-%'");
 	}
 
 	@Test

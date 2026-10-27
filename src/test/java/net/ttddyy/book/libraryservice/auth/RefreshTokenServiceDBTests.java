@@ -53,6 +53,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 @Import({ RefreshTokenService.class, MockClock.class, RefreshTokenServiceDBTests.Config.class })
 @DbTest
+// Not transactional: verifies that rotate() commits the family deletion even when it
+// throws.
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class RefreshTokenServiceDBTests {
 

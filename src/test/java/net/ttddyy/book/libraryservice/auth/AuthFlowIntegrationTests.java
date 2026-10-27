@@ -21,7 +21,6 @@ import java.time.Instant;
 import jakarta.servlet.http.Cookie;
 import net.ttddyy.book.libraryservice.DbTest;
 import net.ttddyy.book.libraryservice.MockClocks.MockClock;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -38,6 +37,7 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -53,6 +53,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @DbTest
+// Each test rolls back, which also removes the data it inserted.
+@Transactional
 @ActiveProfiles("dev")
 class AuthFlowIntegrationTests {
 
@@ -69,21 +71,12 @@ class AuthFlowIntegrationTests {
 
 	@BeforeEach
 	void setUp() {
-		cleanUp();
 		String password = PasswordEncoderFactories.createDelegatingPasswordEncoder().encode("secret");
 		this.jdbcTemplate.update("INSERT INTO users (username, password, enabled) VALUES ('flow-admin', ?, TRUE)",
 				password);
 		this.jdbcTemplate
 			.update("INSERT INTO authorities (username, authority) VALUES ('flow-admin', 'ROLE_SCHOOL_ADMIN')");
 		this.jdbcTemplate.update("INSERT INTO user_schools (username, school_id) VALUES ('flow-admin', 'ocean')");
-	}
-
-	@AfterEach
-	void cleanUp() {
-		this.jdbcTemplate.update("DELETE FROM refresh_tokens WHERE username = 'flow-admin'");
-		this.jdbcTemplate.update("DELETE FROM authorities WHERE username = 'flow-admin'");
-		this.jdbcTemplate.update("DELETE FROM user_schools WHERE username = 'flow-admin'");
-		this.jdbcTemplate.update("DELETE FROM users WHERE username = 'flow-admin'");
 	}
 
 	@Test

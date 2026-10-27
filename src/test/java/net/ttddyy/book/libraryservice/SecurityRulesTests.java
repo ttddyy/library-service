@@ -29,7 +29,6 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import net.ttddyy.book.libraryservice.auth.AccessTokenIssuer;
 import net.ttddyy.book.libraryservice.auth.Account;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -52,6 +51,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
@@ -68,6 +68,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @DbTest
+// Each test rolls back, which also removes the data it inserted.
+@Transactional
 @ActiveProfiles("dev")
 class SecurityRulesTests {
 
@@ -91,12 +93,6 @@ class SecurityRulesTests {
 
 	@Autowired
 	AccessTokenIssuer issuer;
-
-	@AfterEach
-	void cleanup() {
-		this.jdbcTemplate.update("DELETE FROM authorities WHERE username = 'sec-user'");
-		this.jdbcTemplate.update("DELETE FROM users WHERE username = 'sec-user'");
-	}
 
 	private ResultActions perform(HttpMethod method, String path, String role) throws Exception {
 		return this.mvc.perform(MockMvcRequestBuilders.request(method, path)

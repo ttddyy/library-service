@@ -8,11 +8,14 @@ services:
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: library_service
+      # Spring Boot docker compose support (dev profile) connects to this db
+      POSTGRES_DB: library_service_dev
     ports:
       - 5432:5432
     volumes:
       - pgdata:/var/lib/postgresql/data
+      # scripts here run only when the volume is first initialized (creates library_service)
+      - ./init:/docker-entrypoint-initdb.d
 
   adminer:
     container_name: adminer

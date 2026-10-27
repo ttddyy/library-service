@@ -25,7 +25,7 @@ public class TestLibraryServiceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.from(LibraryServiceApplication::main)
-			.with(DevContainerConfiguration.class)
+			.with(DevDatabaseInitializer.class)
 			.withAdditionalProfiles("dev")
 			.run(args);
 	}

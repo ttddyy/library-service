@@ -25,17 +25,22 @@ Or, use the development time support.
 ```shell
 > ./mvnw spring-boot:test-run
 ```
-* In this mode, local postgres is used if available; otherwise, it starts a postgres container via Testcontainers (Docker required).
+* In this mode, postgres (and adminer on port 8888) is started via `docker/postgres/docker-compose.yml` if not already running (Docker required). The containers keep running after the app stops.
+* Uses the `library_service_dev` database; its schema and data are recreated on every startup. (`spring-boot:run` without the `dev` profile uses `library_service`, which is not touched.)
+* Tests use their own Testcontainers postgres, so they can run while the app is running.
+* For a volume created before `library_service_dev` existed, run once: `docker compose -f docker/postgres/docker-compose.yml up -d && docker exec postgres-db psql -U root -d postgres -c "CREATE DATABASE library_service_dev"`
 * The `dev` profile is activated automatically.
 
-Run with the `dev` profile (uses the dev JWT keys in `dev/jwt/` and `cookie-secure=false`).
+Run with the `dev` profile (uses the dev JWT keys in `dev/jwt/` and `cookie-secure=false`, and the `library_service_dev` database via docker compose; its schema is created by `spring-boot:test-run`).
 ```shell
 > ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-Using env variable to specify various values
+Using env variable to specify various values.
+With the `dev` profile, the docker compose connection overrides `spring.datasource.*`, so disable it to use these values.
 ```shell
-SPRING_DATASOURCE_URL=jdbc:postgres://localhost:5432/library_service  \
+SPRING_DOCKER_COMPOSE_ENABLED=false  \
+SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/library_service  \
 SPRING_DATASOURCE_USERNAME=root  \
 SPRING_DATASOURCE_PASSWORD=password  \
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev

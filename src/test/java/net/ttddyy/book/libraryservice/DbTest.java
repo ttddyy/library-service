@@ -22,8 +22,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -31,10 +35,39 @@ import org.springframework.test.context.TestPropertySource;
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import(DevContainerConfiguration.class)
+@Import({ DbTest.DevContainerConfiguration.class, DevDatabaseInitializer.class })
 // To avoid exceeding the max connection due to test-context caching, minimize the
 // num of pool size for each test.
 @TestPropertySource(properties = { "spring.datasource.hikari.maximum-pool-size=2" })
 public @interface DbTest {
+
+	/**
+	 * Postgres container for tests.
+	 * <p>
+	 * Not a {@code @Configuration} on purpose: {@code spring-boot:test-run} puts test
+	 * classes on the classpath, and component scanning would start this container for the
+	 * dev app.
+	 */
+	class DevContainerConfiguration {
+
+		@Bean
+		@ServiceConnection
+		@SuppressWarnings("resource")
+		PostgreSQLContainer postgreSQLContainer() {
+			// Due to the test-context cache, tests keeps connections.
+			// Need to increase the max connections for test.
+			// withReuse(true) only takes effect when "testcontainers.reuse.enable=true"
+			// is set in ~/.testcontainers.properties; otherwise a new container starts
+			// per run.
+			return new PostgreSQLContainer("postgres:17").withReuse(true)
+				.withCommand("postgres -c max_connections=100")
+				.waitingFor(Wait.forListeningPort());
+			// using a static name causes re-run to fail unless removing the container.
+			// .withCreateContainerCmdModifier((cmd) ->
+			// cmd.withName("library-service-testcontainer"));
+
+		}
+
+	}
 
 }

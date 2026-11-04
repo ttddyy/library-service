@@ -56,6 +56,14 @@ class MemberController {
 		return this.memberService.listClasses(schoolId);
 	}
 
+	@GetMapping("/api/members/roster")
+	@Operation(summary = "List active members of a school grade",
+			description = "Optionally filtered by class. Ordered by class, lastnameEn, firstnameEn.")
+	List<MemberDto> roster(@RequestParam String schoolId, @RequestParam int grade,
+			@RequestParam(required = false) @Nullable Integer classNumber) {
+		return MemberMapper.INSTANCE.toDtoList(this.memberService.listRoster(schoolId, grade, classNumber));
+	}
+
 	@GetMapping("/api/members/{id}")
 	@Operation(summary = "Get a member")
 	MemberDto member(@PathVariable long id) {

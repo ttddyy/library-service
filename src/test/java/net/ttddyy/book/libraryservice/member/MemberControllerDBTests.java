@@ -127,4 +127,28 @@ class MemberControllerDBTests {
 		assertThat(result).containsExactly(new MemberClassDto(1, 3));
 	}
 
+	@Test
+	void roster() {
+		persistMember(10L, "last-2", 3);
+		persistMember(20L, "last-1", 3);
+		persistMember(30L, "last-1", 4);
+		this.entityManager.flush();
+
+		assertThat(this.controller.roster("school-A", 1, 3)).extracting(MemberDto::id).containsExactly(20L, 10L);
+		assertThat(this.controller.roster("school-A", 1, null)).extracting(MemberDto::id)
+			.containsExactly(20L, 10L, 30L);
+	}
+
+	private void persistMember(long id, String lastnameEn, int classNumber) {
+		Member member = new Member();
+		member.setId(id);
+		member.setActive(true);
+		member.setFirstnameEn("member-" + id);
+		member.setLastnameEn(lastnameEn);
+		member.setSchoolId("school-A");
+		member.setGrade(1);
+		member.setClassNumber(classNumber);
+		this.entityManager.persist(member);
+	}
+
 }

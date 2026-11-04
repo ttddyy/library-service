@@ -52,6 +52,10 @@ public class MemberService {
 		return this.memberRepository.findClasses(schoolId);
 	}
 
+	public List<Member> listRoster(String schoolId, int grade, @Nullable Integer classNumber) {
+		return this.memberRepository.findRoster(schoolId, grade, classNumber);
+	}
+
 	public Member get(long id) {
 		Member member = this.memberRepository.getReferenceById(id);
 		Hibernate.initialize(member);

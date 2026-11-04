@@ -88,4 +88,28 @@ class MemberServiceDBTests {
 		assertThat(this.memberService.listClasses("unknown")).isEmpty();
 	}
 
+	@Test
+	void listRoster() {
+		String sql = """
+					INSERT INTO members (id, firstname_en, lastname_en, school_id, grade, class_number, active)
+					VALUES	(10, 'b', 'smith', 'sky', 4, 2, true),
+							(20, 'a', 'smith', 'sky', 4, 2, true),
+							(30, 'z', 'adams', 'sky', 4, 2, true),
+							(40, 'c', 'brown', 'sky', 4, 1, true),
+							(50, 'd', 'davis', 'sky', 4, 2, false),
+							(60, 'e', 'evans', 'sky', 3, 2, true),
+							(70, 'f', 'fox', 'ocean', 4, 2, true),
+							(80, 'g', 'green', 'sky', 4, null, true);
+				""";
+		this.jdbcTemplate.update(sql);
+
+		// grade + class: active, this school, ordered by lastnameEn, firstnameEn
+		assertThat(this.memberService.listRoster("sky", 4, 2)).extracting(Member::getId).containsExactly(30L, 20L, 10L);
+		// grade only: grouped by class, null class last
+		assertThat(this.memberService.listRoster("sky", 4, null)).extracting(Member::getId)
+			.containsExactly(40L, 30L, 20L, 10L, 80L);
+		assertThat(this.memberService.listRoster("unknown", 4, null)).isEmpty();
+		assertThat(this.memberService.listRoster("sky", 9, null)).isEmpty();
+	}
+
 }

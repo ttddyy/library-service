@@ -22,6 +22,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.ListQueryByExampleExecutor;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -37,5 +38,13 @@ public interface MemberRepository extends JpaRepository<Member, Long>, ListQuery
 			order by m.grade, m.classNumber
 			""")
 	List<MemberClassDto> findClasses(String schoolId);
+
+	@Query("""
+			select m from Member m
+			where m.schoolId = :schoolId and m.grade = :grade
+			and (:classNumber is null or m.classNumber = :classNumber) and m.active = true
+			order by m.classNumber, m.lastnameEn, m.firstnameEn
+			""")
+	List<Member> findRoster(String schoolId, int grade, @Nullable Integer classNumber);
 
 }

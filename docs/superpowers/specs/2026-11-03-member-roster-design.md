@@ -13,6 +13,7 @@ UI picker for finding a student: a member says "Ocean school, grade 4, class 1";
 ## Non-goals
 - No change to `GET /api/members` (paging, inactive members, existing callers untouched).
 - No name search, no school-name→id mapping.
+- No あいうえお ordering by Japanese name: `lastname`/`firstname` may hold kanji, which can't be sorted by reading. Would need a kana reading column from the batch job; deferred.
 
 ## Approaches
 - A. Add `grade`/`classNumber` to `GET /api/members` — smallest diff, but paged and includes inactive members; UI would pass big page size and sort; making it active-only changes existing behavior.

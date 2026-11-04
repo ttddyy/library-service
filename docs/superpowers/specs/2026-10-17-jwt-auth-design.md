@@ -201,7 +201,7 @@ Changes to `ApplicationSecurityConfiguration`:
 - `oauth2ResourceServer(jwt)` with a `NimbusJwtDecoder` built from the public key, restricted to RS256, validating
   `exp` and `iss`. A `JwtAuthenticationConverter` maps `roles` to `ROLE_*` authorities and uses `sub` as the
   principal name.
-- `httpBasic()` stays (temporary), authenticating against `JdbcUserDetailsManager`.
+- `httpBasic()` was removed; see `2026-11-03-remove-basic-auth-design.md`.
 - `SessionCreationPolicy.STATELESS`; CSRF stays disabled (bearer tokens are not sent automatically; the refresh
   cookie is protected by `SameSite=Strict` plus `X-Requested-With`).
 - `RoleHierarchy` bean: `ROLE_SUPER_ADMIN > ROLE_SCHOOL_ADMIN > ROLE_USER`.

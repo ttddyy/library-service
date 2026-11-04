@@ -209,15 +209,9 @@ class SecurityRulesTests {
 	}
 
 	@Test
-	void basicWithJdbcUserWorks() throws Exception {
+	void basicCredentialsRejected() throws Exception {
 		insertUser();
-		assertAllowed(this.mvc.perform(MockMvcRequestBuilders.get("/api/books").with(httpBasic("sec-user", "secret"))));
-	}
-
-	@Test
-	void badBasicCredentialsSendNoBasicChallenge() throws Exception {
-		insertUser();
-		var response = this.mvc.perform(MockMvcRequestBuilders.get("/api/books").with(httpBasic("sec-user", "wrong")))
+		var response = this.mvc.perform(MockMvcRequestBuilders.get("/api/books").with(httpBasic("sec-user", "secret")))
 			.andExpect(status().isUnauthorized())
 			.andReturn()
 			.getResponse();

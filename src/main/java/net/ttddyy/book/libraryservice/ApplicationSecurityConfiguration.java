@@ -84,7 +84,6 @@ public class ApplicationSecurityConfiguration {
 		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 		http.oauth2ResourceServer(oauth2 -> oauth2.bearerTokenResolver(bearerTokenResolver)
 			.jwt(jwt -> jwt.jwtAuthenticationConverter(converter)));
-		http.httpBasic(basic -> basic.authenticationEntryPoint(entryPoint));
 		http.exceptionHandling(handling -> handling.authenticationEntryPoint(entryPoint));
 		return http.build();
 	}

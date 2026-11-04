@@ -160,8 +160,7 @@ To delete a user, first delete its `refresh_tokens`, `user_schools` and `authori
 Each login starts an independent session, so a user can be logged in on several machines. UI and API are expected to
 share one origin (no CORS).
 
-HTTP Basic against the same `users`/`authorities` tables still works but is **temporary** and will be removed once the UI
-migrates. No Basic challenge is sent, so browsers do not show a login popup. `spring.security.user.*` is no longer used.
+HTTP Basic is not supported; send the access token as `Authorization: Bearer <token>`. No Basic challenge is sent, so browsers do not show a login popup. `spring.security.user.*` is no longer used.
 
 ## Roles
 

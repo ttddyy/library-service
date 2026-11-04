@@ -85,6 +85,8 @@ class MemberControllerDBTests {
 		pageable = PageRequest.of(0, 10, Sort.by("id"));
 		result = this.controller.list(null, pageable);
 		assertThat(result.getContent()).isNotNull().extracting(MemberDto::id).containsExactly(10L, 20L, 30L);
+		assertThat(result.getContent()).extracting(MemberDto::schoolId)
+			.containsExactly("school-A", "school-B", "school-B");
 
 		// with schoolId filter
 		pageable = PageRequest.of(0, 10, Sort.by("id"));

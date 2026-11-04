@@ -31,8 +31,8 @@ public record MemberDto(
 		String firstnameEn,
 		String lastnameEn,
 		String firstname,
-		String lastname
-		//school
+		String lastname,
+		String schoolId
 // @formatter:on
 ) {
 }

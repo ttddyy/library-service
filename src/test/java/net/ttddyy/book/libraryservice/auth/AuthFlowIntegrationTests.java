@@ -120,7 +120,10 @@ class AuthFlowIntegrationTests {
 		this.mvc.perform(get("/v3/api-docs"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.components.securitySchemes.bearer-jwt.scheme").value("bearer"))
-			.andExpect(jsonPath("$.components.securitySchemes.bearer-jwt.bearerFormat").value("JWT"));
+			.andExpect(jsonPath("$.components.securitySchemes.bearer-jwt.bearerFormat").value("JWT"))
+			.andExpect(jsonPath("$.info.title").value("Library Service API"))
+			.andExpect(jsonPath("$.paths['/api/auth/login'].post.security").isEmpty())
+			.andExpect(jsonPath("$.paths['/api/books'].get.security").doesNotExist());
 	}
 
 	private void setNow(Instant instant) {

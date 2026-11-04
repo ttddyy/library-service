@@ -18,6 +18,8 @@ package net.ttddyy.book.libraryservice.member;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Tadaya Tsuyukubo
  */
 @RestController
+@Tag(name = "Members")
 class MemberController {
 
 	private final MemberService memberService;
@@ -40,6 +43,7 @@ class MemberController {
 	}
 
 	@GetMapping("/api/members")
+	@Operation(summary = "List members", description = "Optionally filtered by school.")
 	Page<MemberDto> list(@RequestParam(required = false) @Nullable String schoolId,
 			@ParameterObject Pageable pageable) {
 		Page<Member> page = this.memberService.list(schoolId, pageable);
@@ -47,11 +51,13 @@ class MemberController {
 	}
 
 	@GetMapping("/api/members/classes")
+	@Operation(summary = "List member classes of a school")
 	List<MemberClassDto> classes(@RequestParam String schoolId) {
 		return this.memberService.listClasses(schoolId);
 	}
 
 	@GetMapping("/api/members/{id}")
+	@Operation(summary = "Get a member")
 	MemberDto member(@PathVariable long id) {
 		Member member = this.memberService.get(id);
 		MemberDto memberDto = MemberMapper.INSTANCE.toDto(member);

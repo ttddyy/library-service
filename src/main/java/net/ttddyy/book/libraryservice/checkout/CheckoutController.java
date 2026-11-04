@@ -19,6 +19,8 @@ package net.ttddyy.book.libraryservice.checkout;
 import java.util.Set;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
 
 import org.springframework.data.domain.Page;
@@ -36,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Tadaya Tsuyukubo
  */
 @RestController
+@Tag(name = "Checkouts")
 public class CheckoutController {
 
 	private final CheckoutService checkoutService;
@@ -45,14 +48,16 @@ public class CheckoutController {
 	}
 
 	@PostMapping("/api/checkouts/checkout")
-	@Operation(description = "'force' is optional (default: false)")
-	void checkout(@RequestBody CheckoutBooksDto checkoutBooksDto, @RequestParam(required = false) boolean force) {
+	@Operation(summary = "Check out books")
+	void checkout(@RequestBody CheckoutBooksDto checkoutBooksDto, @Parameter(
+			description = "Bypass checkout limits (default: false)") @RequestParam(required = false) boolean force) {
 		// TODO: may return error due to validation
 		this.checkoutService.checkout(checkoutBooksDto.schoolId(), checkoutBooksDto.memberId(),
 				checkoutBooksDto.bookIds(), force);
 	}
 
 	@PostMapping(value = "/api/checkouts/return")
+	@Operation(summary = "Return books", description = "Request body is the list of book IDs to return.")
 	void bookReturn(@RequestBody Set<Long> bookIds) {
 		// TODO: validation
 		this.checkoutService.bulkReturn(bookIds);
@@ -60,6 +65,8 @@ public class CheckoutController {
 
 	// TODO: memberId has higher priority than schoolId
 	@GetMapping({ "/api/checkouts" })
+	@Operation(summary = "List current checkouts",
+			description = "Filter by member or school. memberId takes precedence over schoolId.")
 	Page<CheckoutDto> list(@RequestParam(required = false) @Nullable Long memberId,
 			@RequestParam(required = false) @Nullable String schoolId, @ParameterObject Pageable pageable) {
 		Page<Checkout> page = this.checkoutService.list(memberId, schoolId, pageable);
@@ -67,6 +74,7 @@ public class CheckoutController {
 	}
 
 	@GetMapping({ "/api/checkouts/overdue" })
+	@Operation(summary = "List overdue checkouts")
 	Page<CheckoutDto> overdue(@ParameterObject Pageable pageable) {
 		// If response json requires more info, create a new dedicated dto class
 		Page<Checkout> page = this.checkoutService.overdue(pageable);

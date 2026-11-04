@@ -18,6 +18,10 @@ package net.ttddyy.book.libraryservice.school;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Tadaya Tsuyukubo
  */
 @RestController
+@Tag(name = "Schools")
 public class SchoolController {
 
 	private final SchoolService schoolService;
@@ -34,6 +39,8 @@ public class SchoolController {
 	}
 
 	@GetMapping("/api/schools")
+	@Operation(summary = "List schools", description = "Public endpoint.")
+	@SecurityRequirements
 	List<SchoolDto> list() {
 		List<School> entities = this.schoolService.list();
 		List<SchoolDto> schools = SchoolMapper.INSTANCE.entitiesToDtoList(entities);

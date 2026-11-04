@@ -18,6 +18,7 @@ package net.ttddyy.book.libraryservice.book;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -40,6 +41,7 @@ import java.util.List;
  * @author Tadaya Tsuyukubo
  */
 @RestController
+@Tag(name = "Books")
 class BookController {
 
 	private final BookService bookService;
@@ -49,6 +51,7 @@ class BookController {
 	}
 
 	@GetMapping("/api/books")
+	@Operation(summary = "List books", description = "Optionally filtered by school and status.")
 	Page<BookDto> list(@RequestParam(required = false) @Nullable String schoolId,
 			@RequestParam(required = false) @Nullable BookStatus status, @ParameterObject Pageable pageable) {
 		Page<Book> page = this.bookService.list(schoolId, status, pageable);
@@ -57,6 +60,7 @@ class BookController {
 	}
 
 	@GetMapping("/api/books/registered")
+	@Operation(summary = "List books registered in a date range", description = "'to' defaults to today when omitted.")
 	Page<BookDto> listRegisteredBooks(@RequestParam(required = false) @Nullable String schoolId,
 			@Parameter(description = "UTC date") @RequestParam LocalDate from,
 			@Parameter(description = "UTC date") @RequestParam(required = false) @Nullable LocalDate to,
@@ -72,6 +76,7 @@ class BookController {
 	}
 
 	@GetMapping("/api/books/{id}")
+	@Operation(summary = "Get a book")
 	BookDto get(@PathVariable long id) {
 		// TODO: when not exist
 		Book book = this.bookService.get(id);
@@ -80,6 +85,7 @@ class BookController {
 	}
 
 	@PostMapping("/api/books")
+	@Operation(summary = "Create books", description = "Bulk create. Requires SCHOOL_ADMIN role.")
 	List<BookDto> create(@RequestBody List<BookDtoCreate> input) {
 		// TODO: validation for required fields
 		List<Book> toCreate = BookMapper.INSTANCE.toBookList(input);
@@ -89,6 +95,7 @@ class BookController {
 	}
 
 	@PutMapping("/api/books/{id}")
+	@Operation(summary = "Update a book", description = "Requires SCHOOL_ADMIN role.")
 	BookDto update(@PathVariable long id, @RequestBody BookDtoUpdate dto) {
 		// TODO: validation
 		Book book = this.bookService.update(id, dto);
@@ -110,7 +117,8 @@ class BookController {
 	// }
 
 	@GetMapping("/api/books/search")
-	@Operation(description = "Search Books. When multiple parameters are provided, they work as AND conditions.")
+	@Operation(summary = "Search books",
+			description = "When multiple parameters are provided, they work as AND conditions.")
 	Page<BookDto> search(
 	// @formatter:off
 			@Nullable @RequestParam String schoolId,

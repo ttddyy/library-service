@@ -16,6 +16,8 @@
 
 package net.ttddyy.book.libraryservice.book.category;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
 
 import org.springframework.data.domain.Page;
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Tadaya Tsuyukubo
  */
 @RestController
+@Tag(name = "Book Categories")
 class BookCategoryController {
 
 	private final BookCategoryService categoryService;
@@ -40,11 +43,13 @@ class BookCategoryController {
 	}
 
 	@GetMapping("/api/books/categories")
+	@Operation(summary = "List book categories of all schools")
 	Page<BookCategoryDto> list(@ParameterObject Pageable pageable) {
 		return list(null, pageable);
 	}
 
 	@GetMapping("/api/books/categories/{schoolId}")
+	@Operation(summary = "List book categories of a school")
 	Page<BookCategoryDto> list(@PathVariable @Nullable String schoolId, @ParameterObject Pageable pageable) {
 		Page<BookCategory> page = this.categoryService.list(schoolId, pageable);
 		return BookCategoryMapper.INSTANCE.toDtoPage(page);

@@ -16,9 +16,11 @@
 
 package net.ttddyy.book.libraryservice.checkout.history;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springdoc.core.converters.models.PageableAsQueryParam;
 
@@ -36,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Tadaya Tsuyukubo
  */
 @RestController
+@Tag(name = "Checkout History")
 public class CheckoutHistoryController {
 
 	private final CheckoutHistoryService checkoutHistoryService;
@@ -45,6 +48,8 @@ public class CheckoutHistoryController {
 	}
 
 	@GetMapping({ "/api/checkouts/history" })
+	@Operation(summary = "Get checkout history",
+			description = "Provide bookId, memberId or both. With both, returns a single history entry; otherwise a page.")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Checkout History(s) retrieved"),
 			@ApiResponse(responseCode = "400", description = "Missing required parameters"),
 			@ApiResponse(responseCode = "404", description = "Specific checkout not found") })

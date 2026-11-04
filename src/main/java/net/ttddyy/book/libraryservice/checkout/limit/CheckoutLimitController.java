@@ -16,6 +16,10 @@
 
 package net.ttddyy.book.libraryservice.checkout.limit;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,11 +28,12 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Responsible for the book checkout and return endpoints.
+ * Responsible for the effective checkout limit endpoints.
  *
  * @author Tadaya Tsuyukubo
  */
 @RestController
+@Tag(name = "Checkout Limits")
 public class CheckoutLimitController {
 
 	private final CheckoutLimitService checkoutLimitService;
@@ -38,7 +43,9 @@ public class CheckoutLimitController {
 	}
 
 	@GetMapping({ "/api/checkouts/limits" })
-	List<CheckoutLimitDto> list(@RequestParam String schoolId, @RequestParam(required = false) LocalDate date) {
+	@Operation(summary = "Get effective checkout limits of a school")
+	List<CheckoutLimitDto> list(@RequestParam String schoolId, @Parameter(
+			description = "Date to evaluate (default: today)") @RequestParam(required = false) LocalDate date) {
 		List<CheckoutLimit> limits = this.checkoutLimitService.getEffectiveCheckoutLimits(schoolId, date);
 		return CheckoutLimitMapper.INSTANCE.toDtoList(limits);
 	}

@@ -18,6 +18,8 @@ package net.ttddyy.book.libraryservice.checkout.limit.defaults;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
 
 import org.springframework.data.domain.Page;
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Tadaya Tsuyukubo
  */
 @RestController
+@Tag(name = "Checkout Limit Defaults")
 class CheckoutLimitDefaultController {
 
 	private final CheckoutLimitDefaultService checkoutLimitDefaultService;
@@ -42,6 +45,7 @@ class CheckoutLimitDefaultController {
 
 	// Since this is a small set of data, no filtering for school-id for listing
 	@GetMapping("/api/checkouts/limits/defaults")
+	@Operation(summary = "List default checkout limits")
 	Page<CheckoutLimitDefaultDto> list(@ParameterObject Pageable pageable) {
 		// TODO: check size limit
 		Page<CheckoutLimitDefault> page = this.checkoutLimitDefaultService.list(pageable);
@@ -49,6 +53,7 @@ class CheckoutLimitDefaultController {
 	}
 
 	@PutMapping("/api/checkouts/limits/defaults")
+	@Operation(summary = "Update default checkout limits", description = "Bulk update. Requires SCHOOL_ADMIN role.")
 	List<CheckoutLimitDefaultDto> bulkUpdate(@RequestBody List<CheckoutLimitDefaultDtoUpdateBulk> dto) {
 		List<CheckoutLimitDefault> updated = this.checkoutLimitDefaultService.update(dto);
 		return CheckoutLimitDefaultMapper.INSTANCE.toDtoList(updated);

@@ -18,6 +18,8 @@ package net.ttddyy.book.libraryservice.checkout.limit.schedule;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
 
 import org.springframework.data.domain.Page;
@@ -35,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Tadaya Tsuyukubo
  */
 @RestController
+@Tag(name = "Checkout Limit Schedules")
 class CheckoutLimitScheduleController {
 
 	private final CheckoutLimitScheduleService checkoutLimitScheduleService;
@@ -44,11 +47,13 @@ class CheckoutLimitScheduleController {
 	}
 
 	@GetMapping("/api/checkouts/limits/schedules")
+	@Operation(summary = "List checkout limit schedules of all schools")
 	Page<CheckoutLimitScheduleDto> list(@ParameterObject Pageable pageable) {
 		return list(null, pageable);
 	}
 
 	@GetMapping("/api/checkouts/limits/schedules/{schoolId}")
+	@Operation(summary = "List checkout limit schedules of a school")
 	Page<CheckoutLimitScheduleDto> list(@PathVariable @Nullable String schoolId, @ParameterObject Pageable pageable) {
 		// TODO: check size limit
 		Page<CheckoutLimitSchedule> page = this.checkoutLimitScheduleService.list(schoolId, pageable);
@@ -56,6 +61,7 @@ class CheckoutLimitScheduleController {
 	}
 
 	@PostMapping("/api/checkouts/limits/schedules")
+	@Operation(summary = "Create checkout limit schedules", description = "Bulk create. Requires SCHOOL_ADMIN role.")
 	List<CheckoutLimitScheduleDto> bulkCreate(@RequestBody List<CheckoutLimitScheduleDtoCreate> dtoList) {
 		// TODO: check id is null
 		List<CheckoutLimitSchedule> entities = CheckoutLimitScheduleMapper.INSTANCE.toEntityList(dtoList);
@@ -64,12 +70,14 @@ class CheckoutLimitScheduleController {
 	}
 
 	@PutMapping("/api/checkouts/limits/schedules")
+	@Operation(summary = "Update checkout limit schedules", description = "Bulk update. Requires SCHOOL_ADMIN role.")
 	List<CheckoutLimitScheduleDto> bulkUpdate(@RequestBody List<CheckoutLimitScheduleDtoUpdate> dtoList) {
 		List<CheckoutLimitSchedule> updated = this.checkoutLimitScheduleService.update(dtoList);
 		return CheckoutLimitScheduleMapper.INSTANCE.toDtoList(updated);
 	}
 
 	@DeleteMapping("/api/checkouts/limits/schedules/{id}")
+	@Operation(summary = "Delete a checkout limit schedule", description = "Requires SCHOOL_ADMIN role.")
 	void delete(@PathVariable long id) {
 		this.checkoutLimitScheduleService.delete(id);
 	}

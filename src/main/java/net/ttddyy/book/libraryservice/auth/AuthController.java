@@ -22,6 +22,13 @@ import java.util.Map;
 
 import net.ttddyy.book.libraryservice.LibraryServiceProperties;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +57,8 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Auth", description = "Login, access token refresh and logout")
+@SecurityRequirements // public endpoints; overrides the global bearer requirement
 public class AuthController {
 
 	private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
@@ -73,6 +82,10 @@ public class AuthController {
 	// JSON body required (415 otherwise) on purpose: blocks cross-site form-post login
 	// CSRF
 	@PostMapping("/login")
+	@Operation(summary = "Log in",
+			description = "Returns an access token and sets the refresh token as an HttpOnly cookie. JSON body required.")
+	@ApiResponse(responseCode = "200", description = "Logged in")
+	@ApiResponse(responseCode = "401", description = "Invalid credentials", content = @Content)
 	ResponseEntity<LoginResponse> login(@RequestBody(required = false) @Nullable LoginRequest request) {
 		if (request == null || !StringUtils.hasText(request.username()) || !StringUtils.hasText(request.password())) {
 			throw new BadCredentialsException("Missing credentials");
@@ -87,9 +100,15 @@ public class AuthController {
 	}
 
 	@PostMapping("/refresh")
+	@Operation(summary = "Refresh access token",
+			description = "Issues a new access token from the refresh token cookie. May rotate the refresh token cookie.")
+	@ApiResponse(responseCode = "200", description = "Token refreshed")
+	@ApiResponse(responseCode = "401", description = "Missing or invalid refresh token", content = @Content)
 	ResponseEntity<TokenResponse> refresh(
-			@RequestHeader(name = "X-Requested-With", required = false) @Nullable String requestedWith,
-			@CookieValue(name = COOKIE_NAME, required = false) @Nullable String refreshToken) {
+			@Parameter(description = "Required (any value); CSRF guard") @RequestHeader(name = "X-Requested-With",
+					required = false) @Nullable String requestedWith,
+			@Parameter(in = ParameterIn.COOKIE, description = "Refresh token") @CookieValue(name = COOKIE_NAME,
+					required = false) @Nullable String refreshToken) {
 		if (requestedWith == null || refreshToken == null) {
 			throw new InvalidRefreshTokenException();
 		}
@@ -103,9 +122,14 @@ public class AuthController {
 	}
 
 	@PostMapping("/logout")
+	@Operation(summary = "Log out", description = "Revokes the refresh token and clears its cookie.")
+	@ApiResponse(responseCode = "204", description = "Logged out")
+	@ApiResponse(responseCode = "401", description = "Missing X-Requested-With header", content = @Content)
 	ResponseEntity<Void> logout(
-			@RequestHeader(name = "X-Requested-With", required = false) @Nullable String requestedWith,
-			@CookieValue(name = COOKIE_NAME, required = false) @Nullable String refreshToken) {
+			@Parameter(description = "Required (any value); CSRF guard") @RequestHeader(name = "X-Requested-With",
+					required = false) @Nullable String requestedWith,
+			@Parameter(in = ParameterIn.COOKIE, description = "Refresh token") @CookieValue(name = COOKIE_NAME,
+					required = false) @Nullable String refreshToken) {
 		if (requestedWith == null) {
 			throw new InvalidRefreshTokenException();
 		}

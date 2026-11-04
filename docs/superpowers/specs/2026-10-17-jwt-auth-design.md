@@ -207,7 +207,7 @@ Changes to `ApplicationSecurityConfiguration`:
 - `RoleHierarchy` bean: `ROLE_SUPER_ADMIN > ROLE_SCHOOL_ADMIN > ROLE_USER`.
 - Unauthenticated requests get `401` with a Bearer challenge
   (`WWW-Authenticate: Bearer`, plus `error="invalid_token"` for a bad token). No Basic challenge is sent, so browsers
-  never show a login popup; proactively sent Basic credentials still work.
+  never show a login popup.
 - Authenticated requests lacking the role get `403`.
 
 Authorization rules, evaluated in order:

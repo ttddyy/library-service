@@ -74,7 +74,7 @@ public @interface DbTest {
 	// raised.
 	@ServiceConnection
 	@SuppressWarnings("resource")
-	PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:17").withReuse(true)
+	PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:18").withReuse(true)
 		.withCommand("postgres -c max_connections=100")
 		.waitingFor(Wait.forListeningPort());
 

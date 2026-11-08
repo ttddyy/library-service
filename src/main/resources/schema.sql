@@ -102,17 +102,19 @@ CREATE TABLE book_status_history
 
 CREATE TABLE members
 (
-    id           INT         NOT NULL PRIMARY KEY,
-    date_added   TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    active       BOOLEAN     NOT NULL DEFAULT TRUE,
-    class_number INT,
-    grade        INT         NOT NULL DEFAULT 99,
-    firstname_en VARCHAR(64) NOT NULL,
-    lastname_en  VARCHAR(64) NOT NULL,
-    firstname    VARCHAR(64),
-    lastname     VARCHAR(64),
-    school_id    VARCHAR(8),
-    updated_at   TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    id             INT         NOT NULL PRIMARY KEY,
+    date_added     TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    active         BOOLEAN     NOT NULL DEFAULT TRUE,
+    class_number   INT,
+    grade          INT         NOT NULL DEFAULT 99,
+    firstname_en   VARCHAR(64) NOT NULL,
+    lastname_en    VARCHAR(64) NOT NULL,
+    firstname      VARCHAR(64),
+    lastname       VARCHAR(64),
+    firstname_kana VARCHAR(64),
+    lastname_kana  VARCHAR(64),
+    school_id      VARCHAR(8),
+    updated_at     TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 

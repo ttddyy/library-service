@@ -27,6 +27,8 @@ public record CheckoutDto(
 		long memberId,
 		String memberFirstName,
 		String memberLastName,
+		String memberFirstNameKana,
+		String memberLastNameKana,
 		int memberGrade,
 		int memberClassNumber,
 		LocalDate checkoutDate,

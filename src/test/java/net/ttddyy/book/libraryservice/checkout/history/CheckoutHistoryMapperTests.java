@@ -53,6 +53,8 @@ class CheckoutHistoryMapperTests {
 		member.setId(memberId);
 		member.setFirstname("bar-firstname");
 		member.setLastname("bar-lastname");
+		member.setFirstnameKana("bar-firstname-kana");
+		member.setLastnameKana("bar-lastname-kana");
 		member.setId(memberId);
 
 		CheckoutHistoryId id = new CheckoutHistoryId(bookId, memberId);
@@ -89,6 +91,8 @@ class CheckoutHistoryMapperTests {
 		assertThat(dto.member()).satisfies((memberDto) -> {
 			assertThat(memberDto.firstname()).isEqualTo("bar-firstname");
 			assertThat(memberDto.lastname()).isEqualTo("bar-lastname");
+			assertThat(memberDto.firstnameKana()).isEqualTo("bar-firstname-kana");
+			assertThat(memberDto.lastnameKana()).isEqualTo("bar-lastname-kana");
 		});
 	}
 

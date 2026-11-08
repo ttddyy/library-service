@@ -43,7 +43,7 @@ public interface MemberRepository extends JpaRepository<Member, Long>, ListQuery
 			select m from Member m
 			where m.schoolId = :schoolId and m.grade = :grade
 			and (:classNumber is null or m.classNumber = :classNumber) and m.active = true
-			order by m.classNumber, m.lastnameEn, m.firstnameEn
+			order by m.classNumber, m.lastnameKana, m.firstnameKana, m.lastnameEn, m.firstnameEn
 			""")
 	List<Member> findRoster(String schoolId, int grade, @Nullable Integer classNumber);
 

@@ -56,6 +56,10 @@ public class Member {
 
 	private String lastname;
 
+	private String firstnameKana;
+
+	private String lastnameKana;
+
 	public Long getId() {
 		return this.id;
 	}
@@ -134,6 +138,22 @@ public class Member {
 
 	public void setLastname(String lastname) {
 		this.lastname = lastname;
+	}
+
+	public String getFirstnameKana() {
+		return this.firstnameKana;
+	}
+
+	public void setFirstnameKana(String firstnameKana) {
+		this.firstnameKana = firstnameKana;
+	}
+
+	public String getLastnameKana() {
+		return this.lastnameKana;
+	}
+
+	public void setLastnameKana(String lastnameKana) {
+		this.lastnameKana = lastnameKana;
 	}
 
 }

@@ -35,6 +35,8 @@ public interface CheckoutMapper {
 	@Mapping(target = "memberId", source = "member.id")
 	@Mapping(target = "memberFirstName", source = "member.firstname")
 	@Mapping(target = "memberLastName", source = "member.lastname")
+	@Mapping(target = "memberFirstNameKana", source = "member.firstnameKana")
+	@Mapping(target = "memberLastNameKana", source = "member.lastnameKana")
 	@Mapping(target = "memberGrade", source = "member.grade")
 	@Mapping(target = "memberClassNumber", source = "member.classNumber")
 	CheckoutDto toDto(Checkout checkout);

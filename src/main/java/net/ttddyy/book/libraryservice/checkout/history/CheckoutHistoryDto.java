@@ -49,6 +49,6 @@ public record CheckoutHistoryDto(
 	) {
 	}
 
-	record Member(String firstname, String lastname) {
+	record Member(String firstname, String lastname, String firstnameKana, String lastnameKana) {
 	};
 }

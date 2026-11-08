@@ -52,6 +52,8 @@ class CheckoutMapperTests {
 		member.setId(memberId);
 		member.setFirstname("foo-firstname");
 		member.setLastname("foo-lastname");
+		member.setFirstnameKana("foo-firstname-kana");
+		member.setLastnameKana("foo-lastname-kana");
 		member.setGrade(7);
 		member.setClassNumber(2);
 
@@ -70,6 +72,8 @@ class CheckoutMapperTests {
 		assertThat(dto.memberId()).isEqualTo(memberId);
 		assertThat(dto.memberFirstName()).isEqualTo("foo-firstname");
 		assertThat(dto.memberLastName()).isEqualTo("foo-lastname");
+		assertThat(dto.memberFirstNameKana()).isEqualTo("foo-firstname-kana");
+		assertThat(dto.memberLastNameKana()).isEqualTo("foo-lastname-kana");
 		assertThat(dto.memberGrade()).isEqualTo(7);
 		assertThat(dto.memberClassNumber()).isEqualTo(2);
 		assertThat(dto.checkoutDate()).isEqualTo("2020-02-02");

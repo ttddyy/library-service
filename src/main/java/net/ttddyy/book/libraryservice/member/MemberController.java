@@ -58,7 +58,7 @@ class MemberController {
 
 	@GetMapping("/api/members/roster")
 	@Operation(summary = "List active members of a school grade",
-			description = "Optionally filtered by class. Ordered by class, lastnameEn, firstnameEn.")
+			description = "Optionally filtered by class. Ordered by class, lastnameKana, firstnameKana, lastnameEn, firstnameEn.")
 	List<MemberDto> roster(@RequestParam String schoolId, @RequestParam int grade,
 			@RequestParam(required = false) @Nullable Integer classNumber) {
 		return MemberMapper.INSTANCE.toDtoList(this.memberService.listRoster(schoolId, grade, classNumber));

@@ -57,6 +57,8 @@ class MemberControllerDBTests {
 		member1.setActive(true);
 		member1.setFirstnameEn("member-1");
 		member1.setLastnameEn("last-1");
+		member1.setFirstnameKana("めんばー");
+		member1.setLastnameKana("らすと");
 		member1.setSchoolId("school-A");
 		member1.setGrade(2);
 		Member member2 = new Member();
@@ -87,6 +89,8 @@ class MemberControllerDBTests {
 		assertThat(result.getContent()).isNotNull().extracting(MemberDto::id).containsExactly(10L, 20L, 30L);
 		assertThat(result.getContent()).extracting(MemberDto::schoolId)
 			.containsExactly("school-A", "school-B", "school-B");
+		assertThat(result.getContent().get(0).firstnameKana()).isEqualTo("めんばー");
+		assertThat(result.getContent().get(0).lastnameKana()).isEqualTo("らすと");
 
 		// with schoolId filter
 		pageable = PageRequest.of(0, 10, Sort.by("id"));

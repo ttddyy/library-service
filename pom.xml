@@ -161,6 +161,10 @@
                 <configuration>
                     <image>
                         <tags>${env.CONTAINER_IMAGE_TAGS}</tags>
+                        <env>
+                            <!-- sets image label org.opencontainers.image.revision -->
+                            <BP_OCI_REVISION>${git.commit.id}</BP_OCI_REVISION>
+                        </env>
                     </image>
                     <docker>
                         <publishRegistry>
